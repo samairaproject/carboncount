@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<!-- Declares this document as HTML5 -->
+<html lang="en">
+<!-- Root element, lang="en" tells browsers/screen readers the page is in English -->
+<head>
+    <meta charset="UTF-8">
+    <!-- Sets the character encoding so special characters and emoji render correctly -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Makes the page render at the device's real width for responsive/mobile layouts -->
+    <title>CarbonCount - Profile</title>
+    <!-- Sets the browser tab title -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Loads the external stylesheet shared by every page on the site -->
+</head>
+<body>
+
+    <header class="site-header">
+        <!-- Semantic header element wraps the cloud graphic and the nav bar -->
+        <div class="cloud-band" aria-hidden="true">
+            <!-- Decorative-only div, so aria-hidden keeps it out of screen reader output -->
+            <svg viewBox="0 0 900 60" preserveAspectRatio="none" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <!-- The scalable vector graphic that draws the animated cloud strip -->
+                <defs>
+                    <!-- Reusable puffy cloud built from overlapping circles, placed repeatedly below with <use> -->
+                    <g id="cloud-shape">
+                        <!-- Groups the shapes below into one named, reusable cloud unit -->
+                        <ellipse cx="0" cy="18" rx="28" ry="10"/>
+                        <!-- The cloud's flat, wide base shape -->
+                        <circle cx="-18" cy="12" r="11"/>
+                        <!-- Left puff of the cloud -->
+                        <circle cx="0" cy="7" r="13"/>
+                        <!-- Top-center puff, the tallest part of the cloud -->
+                        <circle cx="18" cy="12" r="11"/>
+                        <!-- Right puff of the cloud -->
+                        <circle cx="30" cy="16" r="8"/>
+                        <!-- Small outer puff on the right edge -->
+                        <circle cx="-30" cy="16" r="8"/>
+                        <!-- Small outer puff on the left edge -->
+                    </g>
+                </defs>
+                <!-- Back cloud layer drifts slowly in reverse for a parallax depth effect -->
+                <g class="drift-slow" fill="#eaf5fb" opacity="0.6">
+                    <!-- Group of faint, distant clouds; CSS animates this group's position -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="80" y="4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="340" y="-6"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="620" y="8"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="880" y="-4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1160" y="4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1420" y="-6"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1700" y="8"/>
+                    <!-- Each <use> places one more copy of the cloud shape at a different x/y position -->
+                </g>
+                <!-- Front cloud layer drifts forward and sits lower, closer to the horizon -->
+                <g class="drift" fill="#ffffff">
+                    <!-- Group of brighter, closer clouds animated in the opposite direction -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="150" y="16"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="470" y="20"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="760" y="14"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1050" y="16"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1370" y="20"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1660" y="14"/>
+                    <!-- Each <use> places one more copy of the cloud shape at a different x/y position -->
+                </g>
+            </svg>
+        </div>
+
+        <nav class="top-nav" aria-label="Main Navigation">
+            <!-- Semantic nav element, labeled for screen readers as the main navigation landmark -->
+            <a class="brand" href="index.html">🌲 CarbonCount</a>
+            <!-- Site logo/name, links back to the homepage -->
+            <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle navigation menu">☰</button>
+            <!-- Hamburger button, only visible on narrow screens; toggled by site.js -->
+            <div id="nav-menu" class="nav-menu">
+                <!-- Container for the nav links; site.js adds the .open class on mobile when toggled -->
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <!-- Link to the About page (merged About App + The Problem) -->
+                <a href="profile.html" class="active">Profile</a>
+                <!-- Link to this page; class="active" highlights it in the nav -->
+                <a href="log.html">Daily Log</a>
+                <a href="route.html">Route Planner</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-section">
+        <!-- Semantic main element holds this page's unique content -->
+        <p class="eyebrow">Your account</p>
+        <!-- Small uppercase label sitting above the main heading -->
+        <h2>Your Eco Profile</h2>
+        <!-- Page's main heading -->
+        <p class="lede">This information helps CarbonCount understand what routes and suggestions will actually work for you. Everything here is stored only in this browser — nothing is sent anywhere.</p>
+        <!-- Intro paragraph explaining the privacy model -->
+
+        <div class="profile-status">
+            <!-- Row of two stat cards showing gamification progress -->
+            <div class="status-card">
+                <h3>Level</h3>
+                <p class="status-value" id="stat-level">1</p>
+                <!-- Placeholder "1"; renderProgress() below overwrites this with the real computed level -->
+            </div>
+            <div class="status-card">
+                <h3>Points</h3>
+                <p class="status-value" id="stat-points">0 XP</p>
+                <!-- Placeholder "0 XP"; renderProgress() below overwrites this with the real computed points -->
+            </div>
+        </div>
+
+        <section class="card">
+            <!-- Bio section -->
+            <h3>About You</h3>
+            <div class="form-group">
+                <label for="bio">Your bio</label>
+                <!-- Associates this label with the textarea below via the matching id -->
+                <textarea id="bio" placeholder="Tell us a little about yourself — where you're based, what motivates you to reduce your footprint, anything you'd like your profile to say."></textarea>
+                <!-- Free-text bio field; value is loaded from and saved to localStorage by the script below -->
+            </div>
+            <button type="button" id="save-bio">Save bio</button>
+            <!-- type="button" stops it from trying to submit a form; click handler is wired up in the script -->
+        </section>
+
+        <section class="card">
+            <!-- Accessibility & mobility needs section -->
+            <h3>Accessibility & Mobility Needs</h3>
+            <p>Select anything that applies to how you get around. This helps route suggestions elsewhere in the app take your needs into account. Sharing this is entirely optional — leave it blank if you'd rather not say.</p>
+            <fieldset>
+                <!-- Groups the related checkboxes with a visible legend for screen readers -->
+                <legend>I identify with / navigate using:</legend>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="acc-wheelchair" value="Wheelchair or powerchair user">
+                    <label for="acc-wheelchair">Wheelchair or powerchair user</label>
+                    <!-- Checkbox value is what gets saved to localStorage when checked -->
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="acc-low-vision" value="Low vision or blind">
+                    <label for="acc-low-vision">Low vision or blind</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="acc-deaf" value="Deaf or hard of hearing">
+                    <label for="acc-deaf">Deaf or hard of hearing</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="acc-chronic" value="Chronic illness or limited stamina">
+                    <label for="acc-chronic">Chronic illness or limited stamina</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="acc-neuro" value="Neurodivergent (sensory or cognitive considerations)">
+                    <label for="acc-neuro">Neurodivergent (sensory or cognitive considerations)</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="acc-cane" value="Cane, walker, or mobility aid user">
+                    <label for="acc-cane">Cane, walker, or mobility aid user</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="acc-prefer-not" value="Prefer not to say">
+                    <label for="acc-prefer-not">Prefer not to say</label>
+                    <!-- Explicit opt-out option so nobody feels forced to disclose -->
+                </div>
+            </fieldset>
+            <div class="form-group">
+                <label for="acc-notes">Anything else route planning should know?</label>
+                <textarea id="acc-notes" placeholder="e.g. I need routes with step-free access, or I avoid long walks in extreme heat."></textarea>
+                <!-- Free-text field for anything not covered by the checkboxes above -->
+            </div>
+            <button type="button" id="save-accessibility">Save accessibility info</button>
+        </section>
+
+        <section class="card">
+            <!-- Activity/travel-mode preference section -->
+            <h3>Activity Preferences</h3>
+            <p>Which lower-carbon ways of getting around do you actually enjoy or rely on? Select all that fit.</p>
+            <fieldset>
+                <legend>I prefer:</legend>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="pref-transit" value="Public transit (bus/train)">
+                    <label for="pref-transit">Public transit (bus/train)</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="pref-accessible" value="Accessible routing (wheelchair/powerchair)">
+                    <label for="pref-accessible">Accessible routing (wheelchair/powerchair)</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="pref-walk" value="Walking or biking">
+                    <label for="pref-walk">Walking or biking</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="pref-carpool" value="Carpooling or rideshare">
+                    <label for="pref-carpool">Carpooling or rideshare</label>
+                </div>
+            </fieldset>
+            <button type="button" id="save-prefs">Save preferences</button>
+        </section>
+
+        <section class="settings-section card">
+            <!-- Static region/political-context section (not user-editable) -->
+            <h3>Region Settings</h3>
+            <p><strong>Current Location:</strong> New York Metro Area</p>
+            <p><strong>Local Political Impact:</strong> Regional clean transit initiatives are currently active.</p>
+        </section>
+
+        <section class="achievements-section card">
+            <!-- Dynamic badges section, populated entirely by renderProgress() in the script below -->
+            <h3>Your Badges & Streaks</h3>
+            <p style="margin-top:0; font-size:0.9rem; color:#4f5f57;">Earned automatically from your Daily Log and profile — nothing to set up here.</p>
+            <div class="badge-container" id="badge-container"></div>
+            <!-- Left empty on purpose; renderProgress() fills this with earned/locked badge spans -->
+        </section>
+    </main>
+
+    <div class="save-toast" id="toast">Saved!</div>
+    <!-- Small floating confirmation banner; shown briefly by showToast() after each save -->
+
+    <footer>
+        <!-- Semantic footer element -->
+        <p>&copy; 2026 CarbonCount</p>
+        <!-- Copyright line; site.js inserts the subscribe form and share button above this -->
+    </footer>
+
+    <script>
+        // Shows a brief confirmation message in the floating toast, then hides it again after 1.8 seconds.
+        function showToast(msg) {
+            const t = document.getElementById('toast'); // grabs the toast element
+            t.textContent = msg; // sets the message text
+            t.classList.add('show'); // makes it visible via CSS
+            setTimeout(() => t.classList.remove('show'), 1800); // hides it again after a short delay
+        }
+
+        // Returns the .value of every checked checkbox in the given list of element ids.
+        function getChecked(ids) {
+            return ids.filter(id => document.getElementById(id).checked) // keeps only the ids whose checkbox is checked
+                      .map(id => document.getElementById(id).value); // converts each surviving id into its checkbox's value
+        }
+
+        // Given a list of ids and a list of previously-saved values, re-checks whichever checkboxes match.
+        function setChecked(ids, values) {
+            ids.forEach(id => {
+                const el = document.getElementById(id); // looks up this checkbox
+                el.checked = values.includes(el.value); // checks it if its value was in the saved list
+            });
+        }
+
+        // Load saved data on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('bio').value = localStorage.getItem('cp_bio') || ''; // restores the saved bio text, or blank if none
+            document.getElementById('acc-notes').value = localStorage.getItem('cp_acc_notes') || ''; // restores saved accessibility notes
+
+            const accIds = ['acc-wheelchair','acc-low-vision','acc-deaf','acc-chronic','acc-neuro','acc-cane','acc-prefer-not']; // all accessibility checkbox ids
+            const savedAcc = JSON.parse(localStorage.getItem('cp_accessibility') || '[]'); // parses the saved list back into an array
+            setChecked(accIds, savedAcc); // re-checks whichever boxes were previously saved
+
+            const prefIds = ['pref-transit','pref-accessible','pref-walk','pref-carpool']; // all preference checkbox ids
+            const savedPrefs = JSON.parse(localStorage.getItem('cp_prefs') || '[]'); // parses the saved list back into an array
+            setChecked(prefIds, savedPrefs); // re-checks whichever boxes were previously saved
+
+            renderProgress(); // computes and displays level, points, and badges based on real saved data
+        });
+
+        // Innovative feature: computes level, XP, and badge unlocks live from real Daily Log and Profile data,
+        // instead of showing fixed placeholder numbers — this is what makes the gamification actually mean something.
+        function renderProgress() {
+            const entries = JSON.parse(localStorage.getItem('cp_log_entries') || '[]'); // every trip logged on the Daily Log page
+            const bio = localStorage.getItem('cp_bio') || ''; // the saved bio text
+            const acc = JSON.parse(localStorage.getItem('cp_accessibility') || '[]'); // saved accessibility selections
+            const prefs = JSON.parse(localStorage.getItem('cp_prefs') || '[]'); // saved travel-mode preferences
+
+            const totalMiles = entries.reduce((s, e) => s + e.miles, 0); // sums up miles across every logged trip
+            const lowCarbonTrips = entries.filter(e => e.type === 'walking' || e.type === 'accessible').length; // counts zero/low-carbon trips
+
+            // Points: 10 per trip logged, 2 per mile, 15 bonus per low-carbon trip
+            const points = entries.length * 10 + Math.round(totalMiles * 2) + lowCarbonTrips * 15; // combines all three point sources
+            const level = Math.floor(points / 100) + 1; // every 100 points advances one level, starting at level 1
+
+            document.getElementById('stat-points').textContent = points + ' XP'; // updates the Points stat card
+            document.getElementById('stat-level').textContent = level; // updates the Level stat card
+
+            const badges = []; // will hold every possible badge, earned or not
+            badges.push({ emoji: '🌱', label: 'Eco Starter', earned: true }); // always unlocked, a welcome badge
+            badges.push({ emoji: '📝', label: 'First Trip Logged', earned: entries.length >= 1 }); // unlocked after 1+ trips
+            badges.push({ emoji: '🚌', label: '5 Trips Logged', earned: entries.length >= 5 }); // unlocked after 5+ trips
+            badges.push({ emoji: '🛣️', label: '10+ Miles Tracked', earned: totalMiles >= 10 }); // unlocked after 10+ total miles
+            badges.push({ emoji: '♿', label: 'Zero/Low-Carbon Trip', earned: lowCarbonTrips >= 1 }); // unlocked after 1+ low-carbon trip
+            badges.push({ emoji: '🧭', label: 'Profile Complete', earned: bio.trim().length > 0 && (acc.length > 0 || prefs.length > 0) }); // unlocked once bio + at least one checklist is filled in
+
+            const container = document.getElementById('badge-container'); // the empty div badges get rendered into
+            container.innerHTML = badges.map(b =>
+                `<span class="badge ${b.earned ? '' : 'muted'}">${b.emoji} ${b.label}${b.earned ? '' : ' (locked)'}</span>` // builds one badge pill per entry, dimmed and labeled "(locked)" if not yet earned
+            ).join(''); // joins all the badge pills into one HTML string
+        }
+
+        document.getElementById('save-bio').addEventListener('click', () => {
+            localStorage.setItem('cp_bio', document.getElementById('bio').value); // persists the current bio text
+            showToast('Bio saved!'); // confirms the save to the user
+            renderProgress(); // re-checks badge eligibility, since "Profile Complete" depends on the bio
+        });
+
+        document.getElementById('save-accessibility').addEventListener('click', () => {
+            const accIds = ['acc-wheelchair','acc-low-vision','acc-deaf','acc-chronic','acc-neuro','acc-cane','acc-prefer-not']; // all accessibility checkbox ids
+            localStorage.setItem('cp_accessibility', JSON.stringify(getChecked(accIds))); // saves whichever boxes are currently checked
+            localStorage.setItem('cp_acc_notes', document.getElementById('acc-notes').value); // saves the free-text notes field
+            showToast('Accessibility info saved!'); // confirms the save to the user
+            renderProgress(); // re-checks badge eligibility, since "Profile Complete" depends on this too
+        });
+
+        document.getElementById('save-prefs').addEventListener('click', () => {
+            const prefIds = ['pref-transit','pref-accessible','pref-walk','pref-carpool']; // all preference checkbox ids
+            localStorage.setItem('cp_prefs', JSON.stringify(getChecked(prefIds))); // saves whichever boxes are currently checked
+            showToast('Preferences saved!'); // confirms the save to the user
+            renderProgress(); // re-checks badge eligibility
+        });
+    </script>
+
+    <script src="site.js"></script>
+    <!-- Loads the shared site script (nav toggle, dark mode, accessibility panel, search, footer extras) -->
+</body>
+</html>

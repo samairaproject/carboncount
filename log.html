@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarbonCount - Daily Log</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <!-- Semantic header element -->
+        <div class="cloud-band" aria-hidden="true">
+            <!-- Decorative-only div -->
+            <svg viewBox="0 0 900 60" preserveAspectRatio="none" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <defs>
+                    <!-- Reusable puffy cloud -->
+                    <g id="cloud-shape">
+                        <ellipse cx="0" cy="18" rx="28" ry="10"/>
+                        <circle cx="-18" cy="12" r="11"/>
+                        <circle cx="0" cy="7" r="13"/>
+                        <circle cx="18" cy="12" r="11"/>
+                        <circle cx="30" cy="16" r="8"/>
+                        <circle cx="-30" cy="16" r="8"/>
+                    </g>
+                </defs>
+             
+                <g class="drift-slow" fill="#eaf5fb" opacity="0.6">
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="80" y="4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="340" y="-6"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="620" y="8"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="880" y="-4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1160" y="4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1420" y="-6"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1700" y="8"/>
+                </g>
+            
+                <g class="drift" fill="#ffffff">
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="150" y="16"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="470" y="20"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="760" y="14"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1050" y="16"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1370" y="20"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1660" y="14"/>
+                </g>
+            </svg>
+        </div>
+
+        <nav class="top-nav" aria-label="Main Navigation">
+            <a class="brand" href="index.html">🌲 CarbonCount</a>
+            <!-- Site logo/name, links back to the homepage -->
+            <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle navigation menu">☰</button>
+                        <!-- Container for the nav links; site.js adds the .open class on mobile when toggled -->
+            <div id="nav-menu" class="nav-menu">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <!-- Link to the About page (merged About App + The Problem) -->
+                <a href="profile.html">Profile</a>
+                <a href="log.html" class="active">Daily Log</a>
+                <!-- Link to this page; class="active" highlights it in the nav -->
+                <a href="route.html">Route Planner</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-section">
+        <p class="eyebrow">Today</p>
+        <h2>Daily Footprint Tracker</h2>
+        <p class="lede">Log every trip you take today. Pick the mode, describe what you did (or tap 🎤 to speak it instead of typing), and enter the distance — CarbonCount estimates the carbon impact, tracks your weekly trend, and keeps a streak going as long as you log something each day.</p>
+        <div id="streak-display"></div>
+        <!-- Empty on purpose; renderStreak() in the script below fills this with the current streak pill -->
+
+        <form class="log-form" id="log-form">
+            <!-- The trip-logging form; submit is intercepted by JS below instead of actually posting anywhere -->
+            <div class="form-group">
+                <label for="activity-type">Select Activity:</label>
+                <select id="activity-type" name="activity-type" required>
+                    <!-- data-factor on each option is the lbs-of-CO2-per-mile used in the calculation below -->
+                    <option value="">-- Choose an option --</option>
+                    <option value="driving" data-factor="0.89">Driving a Car</option>
+                    <option value="transit" data-factor="0.45">Taking Public Transit (Bus/Train)</option>
+                    <option value="accessible" data-factor="0.10">Accessible Routing (Wheelchair/Powerchair)</option>
+                    <option value="walking" data-factor="0.00">Walking / Biking</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="activity-desc">Describe this trip:</label>
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="activity-desc" name="activity-desc" placeholder="e.g. Commute to work, grocery run, visiting a friend" style="flex:1;">
+                    <!-- Feature: voice input -->
+                    <button type="button" id="voice-btn" class="secondary" aria-label="Speak your trip description" title="Speak your trip description">🎤</button>
+                    <!-- Click starts listening; the script below fills the text field with the spoken words -->
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Miles traveled:</label>
+                <input type="number" id="duration" name="duration" placeholder="e.g. 5" min="0.1" step="0.1" required>
+                <!-- min/step keep the input to positive, one-decimal mile values -->
+            </div>
+
+            <!-- Feature: Accessibility barrier tracker -->
+            <div class="form-group">
+                <label style="display:flex; align-items:flex-start; gap:8px; font-weight:normal;">
+                    <input type="checkbox" id="barrier-flag" style="margin-top:3px;">
+                    <span>This trip defaulted to a higher-carbon option because of an accessibility barrier (e.g. broken elevator, no ramp, closed station, unreliable paratransit)</span>
+                </label>
+                <div id="barrier-note-wrap" style="display:none; margin-top:8px;">
+                    <label for="barrier-note">What was the barrier?</label>
+                    <input type="text" id="barrier-note" placeholder="e.g. Elevator out of service at 5th St station">
+                </div>
+            </div>
+
+            <button type="submit">Log Activity</button>
+            <!-- type="submit" triggers the form's submit event, handled entirely in JS below -->
+        </form>
+
+        <div class="log-summary">
+            <!-- Row of three cards summarizing today's activity -->
+            <div class="status-card">
+                <h3>Trips Today</h3>
+                <p class="status-value" id="stat-trips">0</p>
+                <!-- Placeholder "0"; renderEntries() below overwrites this with today's real trip count -->
+            </div>
+            <div class="status-card">
+                <h3>Miles Logged</h3>
+                <p class="status-value" id="stat-miles">0</p>
+                <!-- Placeholder "0"; renderEntries() below overwrites this with today's real mile total -->
+            </div>
+            <div class="status-card">
+                <h3>Est. CO₂ (lbs)</h3>
+                <p class="status-value" id="stat-co2">0</p>
+                <!-- Placeholder "0"; renderEntries() below overwrites this with today's real CO2 total -->
+            </div>
+            <div class="status-card">
+                <h3>Barrier-Forced Trips</h3>
+                <p class="status-value" id="stat-barriers">0</p>
+                <!-- Placeholder "0"; renderEntries() below overwrites this with today's count of accessibility-barrier trips -->
+            </div>
+            <div class="status-card">
+                <h3>CO₂ Saved vs Driving (lbs)</h3>
+                <p class="status-value" id="stat-saved">0</p>
+            </div>
+        </div>
+
+        <section class="card">
+            <!-- Weekly trend chart card -->
+            <h3>This Week's Trend</h3>
+            <p style="margin:0; font-size:0.9rem; color:#4f5f57;">Estimated lbs of CO₂ logged per day, last 7 days.</p>
+            <div class="week-chart" id="week-chart" role="img" aria-label="Bar chart of estimated CO2 per day over the last 7 days"></div>
+            <!-- Empty on purpose; renderWeekChart() builds one bar per day here -->
+        </section>
+
+        <section class="card">
+            <!-- Weekly CO2 goal + progress bar -->
+            <h3>Weekly Goal</h3>
+            <p>Set a weekly CO₂ target and see how this week is tracking against it.</p>
+            <div class="form-group" style="max-width: 240px;">
+                <label for="goal-input">Weekly goal (lbs CO₂)</label>
+                <input type="number" id="goal-input" min="1" step="1" placeholder="e.g. 20">
+            </div>
+            <button type="button" id="save-goal" class="secondary">Save goal</button>
+            <!-- Click handler in the script below saves this value and re-renders the progress bar -->
+            <div id="goal-progress" style="margin-top: 14px;"></div>
+            <!-- Empty on purpose; renderGoal() below fills this with the progress bar and label -->
+        </section>
+
+        <section class="card" id="barrier-report-card">
+            <!-- Accessibility barrier report -->
+            <h3>♿ Accessibility Barrier Report</h3>
+            <p style="margin:0 0 10px; font-size:0.9rem; color:#4f5f57;">Trips in the last 7 days where an accessibility barrier forced a higher-carbon choice — this is the data point that shows infrastructure gaps as an emissions cost, not just an inconvenience.</p>
+            <div id="barrier-report"></div>
+            <!-- Empty on purpose; renderBarrierReport() below fills this in -->
+        </section>
+
+        <section class="log-history card">
+            <!-- List of today's logged trips -->
+            <h3>Today's Contributions</h3>
+            <div id="entries-list">
+                <p class="empty-notice" id="empty-notice">No entries recorded yet. Use the form above to add an activity!</p>
+                <!-- Default message; renderEntries() below replaces this with real entry cards once any exist -->
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button type="button" class="secondary" id="export-csv">Export as CSV</button>
+                <!-- Downloads all entries as a .csv file; handled in the script below -->
+                <button type="button" class="secondary" id="clear-log" style="display: none;">Clear all entries</button>
+                <!-- Hidden until there's at least one entry; deletes everything after a confirm prompt -->
+            </div>
+        </section>
+    </main>
+
+    <div class="save-toast" id="toast">Logged!</div>
+    <!-- Small floating confirmation banner -->
+
+    <footer>
+        <!-- Semantic footer -->
+        <p>&copy; 2026 CarbonCount</p>
+        <!-- Copyright line; site.js inserts the subscribe form and share button above this -->
+    </footer>
+
+    <script src="site.js"></script>
+    <!-- Loads the shared site script (nav toggle, dark mode, accessibility panel, search, footer extras) -->
+    <script>
+        const STORAGE_KEY = 'cp_log_entries';
+        const GOAL_KEY = 'cp_weekly_goal';
+        const labels = {
+            driving: 'Driving a Car',
+            transit: 'Public Transit',
+            accessible: 'Accessible Routing',
+            walking: 'Walking / Biking'
+        };
+
+        function loadEntries() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        }
+        function saveEntries(entries) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+        }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 1600);
+        }
+        function dayKey(ts) {
+            return new Date(ts).toDateString();
+        }
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function renderEntries() {
+            const entries = loadEntries();
+            const today = dayKey(Date.now());
+            const todaysEntries = entries.filter(e => dayKey(e.ts) === today);
+
+            const list = document.getElementById('entries-list');
+            const emptyNotice = document.getElementById('empty-notice');
+            const clearBtn = document.getElementById('clear-log');
+            list.innerHTML = '';
+
+            if (todaysEntries.length === 0) {
+                list.appendChild(emptyNotice);
+            } else {
+                todaysEntries.forEach((entry) => {
+                    const globalIndex = entries.indexOf(entry);
+                    const div = document.createElement('div');
+                    div.className = 'log-entry';
+                    div.innerHTML = `
+                        <div>
+                            <strong>${labels[entry.type] || entry.type}</strong>
+                            ${entry.desc ? ' — ' + escapeHtml(entry.desc) : ''}
+                            <div class="entry-meta">${entry.miles} miles · ~${entry.co2.toFixed(1)} lbs CO₂</div>
+                            ${entry.barrier ? `<div class="entry-meta" style="color:#b3541e;">♿ Barrier-forced${entry.barrierNote ? ': ' + escapeHtml(entry.barrierNote) : ''}</div>` : ''}
+                        </div>
+                        <button type="button" data-index="${globalIndex}" aria-label="Remove entry">Remove</button>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+            clearBtn.style.display = entries.length ? 'inline-block' : 'none';
+
+            document.getElementById('stat-trips').textContent = todaysEntries.length;
+            document.getElementById('stat-miles').textContent = todaysEntries.reduce((s, e) => s + e.miles, 0).toFixed(1);
+            document.getElementById('stat-co2').textContent = todaysEntries.reduce((s, e) => s + e.co2, 0).toFixed(1);
+            document.getElementById('stat-barriers').textContent = todaysEntries.filter(e => e.barrier).length;
+            // Savings: what the same miles would have emitted if driven (0.89 lbs/mile), minus what was actually logged.
+            document.getElementById('stat-saved').textContent = todaysEntries.reduce((s, e) => s + Math.max(0, e.miles * 0.89 - e.co2), 0).toFixed(1);
+
+            list.querySelectorAll('button[data-index]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const all = loadEntries();
+                    all.splice(parseInt(btn.dataset.index, 10), 1);
+                    saveEntries(all);
+                    renderAll();
+                });
+            });
+        }
+
+        function renderWeekChart() {
+            const entries = loadEntries();
+            const chart = document.getElementById('week-chart');
+            chart.innerHTML = '';
+
+            const days = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                days.push(d);
+            }
+
+            const totals = days.map(d => {
+                const key = d.toDateString();
+                return entries.filter(e => dayKey(e.ts) === key).reduce((s, e) => s + e.co2, 0);
+            });
+            const max = Math.max(...totals, 1);
+            const todayKey = new Date().toDateString();
+
+            days.forEach((d, i) => {
+                const col = document.createElement('div');
+                col.className = 'bar-col';
+                const isToday = d.toDateString() === todayKey;
+                const heightPct = Math.max((totals[i] / max) * 100, 2);
+                col.innerHTML = `
+                    <div class="bar ${isToday ? 'today' : ''}" style="height:${heightPct}%" title="${totals[i].toFixed(1)} lbs CO₂"></div>
+                    <span class="bar-label">${d.toLocaleDateString(undefined, { weekday: 'short' })}</span>
+                `;
+                chart.appendChild(col);
+            });
+        }
+
+        function renderStreak() {
+            const entries = loadEntries();
+            const daySet = new Set(entries.map(e => dayKey(e.ts)));
+            let streak = 0;
+            let cursor = new Date();
+            while (daySet.has(cursor.toDateString())) {
+                streak++;
+                cursor.setDate(cursor.getDate() - 1);
+            }
+            const el = document.getElementById('streak-display');
+            el.innerHTML = streak > 0
+                ? `<span class="streak-pill">🔥 ${streak}-day logging streak</span>`
+                : `<span class="streak-pill" style="background:var(--sky); color:var(--canopy-dark);">Log today to start a streak</span>`;
+        }
+
+        function renderGoal() {
+            const goal = parseFloat(localStorage.getItem(GOAL_KEY) || '0');
+            document.getElementById('goal-input').value = goal || '';
+
+            const entries = loadEntries();
+            const weekAgo = Date.now() - 6 * 24 * 60 * 60 * 1000;
+            const weekTotal = entries.filter(e => e.ts >= weekAgo).reduce((s, e) => s + e.co2, 0);
+
+            const box = document.getElementById('goal-progress');
+            if (!goal) {
+                box.innerHTML = '<p class="progress-label">No goal set yet — enter a weekly target above.</p>';
+                return;
+            }
+            const pct = Math.min((weekTotal / goal) * 100, 100);
+            const over = weekTotal > goal;
+            box.innerHTML = `
+                <div class="progress-track">
+                    <div class="progress-fill ${over ? 'over-goal' : ''}" style="width:${pct}%"></div>
+                </div>
+                <p class="progress-label">${weekTotal.toFixed(1)} of ${goal} lbs CO₂ this week${over ? ' — over goal, consider a lower-carbon trip next time' : ''}</p>
+            `;
+        }
+
+        function renderBarrierReport() {
+            const entries = loadEntries();
+            const weekAgo = Date.now() - 6 * 24 * 60 * 60 * 1000;
+            const weekEntries = entries.filter(e => e.ts >= weekAgo);
+            const barrierEntries = weekEntries.filter(e => e.barrier);
+
+            const box = document.getElementById('barrier-report');
+            if (weekEntries.length === 0) {
+                box.innerHTML = '<p class="progress-label">No trips logged this week yet.</p>';
+                return;
+            }
+            if (barrierEntries.length === 0) {
+                box.innerHTML = '<p class="progress-label">No accessibility barriers reported this week. 🎉</p>';
+                return;
+            }
+            // Rough estimate of the CO2 that would have been avoided if these barrier-forced trips had been made at the walking/biking rate (0 lbs/mile) instead.
+            const co2FromBarrierTrips = barrierEntries.reduce((s, e) => s + e.co2, 0);
+            const pctOfTrips = ((barrierEntries.length / weekEntries.length) * 100).toFixed(0);
+            const notesList = barrierEntries
+                .filter(e => e.barrierNote)
+                .slice(-3)
+                .map(e => `<li>${escapeHtml(e.barrierNote)}</li>`)
+                .join('');
+
+            box.innerHTML = `
+                <div class="log-summary" style="margin-bottom:10px;">
+                    <div class="status-card">
+                        <h3>Barrier-Forced Trips</h3>
+                        <p class="status-value">${barrierEntries.length}</p>
+                    </div>
+                    <div class="status-card">
+                        <h3>Share of Weekly Trips</h3>
+                        <p class="status-value">${pctOfTrips}%</p>
+                    </div>
+                    <div class="status-card">
+                        <h3>Est. CO₂ From These Trips</h3>
+                        <p class="status-value">${co2FromBarrierTrips.toFixed(1)}</p>
+                    </div>
+                </div>
+                ${notesList ? `<p class="progress-label" style="margin-bottom:4px;">Recent barriers reported:</p><ul style="margin:0; padding-left:20px; font-size:0.9rem; color:#4f5f57;">${notesList}</ul>` : ''}
+            `;
+        }
+
+        function renderAll() {
+            renderEntries();
+            renderWeekChart();
+            renderStreak();
+            renderGoal();
+            renderBarrierReport();
+        }
+
+        document.getElementById('log-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const select = document.getElementById('activity-type');
+            const type = select.value;
+            const desc = document.getElementById('activity-desc').value.trim();
+            const miles = parseFloat(document.getElementById('duration').value);
+            const factor = parseFloat(select.selectedOptions[0]?.dataset.factor || '0');
+            if (!type || isNaN(miles) || miles <= 0) return;
+
+            const barrier = document.getElementById('barrier-flag').checked;
+            const barrierNote = document.getElementById('barrier-note').value.trim();
+
+            const entries = loadEntries();
+            entries.push({ type, desc, miles, co2: miles * factor, ts: Date.now(), barrier, barrierNote: barrier ? barrierNote : '' });
+            saveEntries(entries);
+            renderAll();
+            showToast('Activity logged!');
+            document.getElementById('log-form').reset();
+            document.getElementById('barrier-note-wrap').style.display = 'none';
+        });
+
+        // Shows the "what was the barrier?" note field once the checkbox above it is checked.
+        document.getElementById('barrier-flag').addEventListener('change', function () {
+            document.getElementById('barrier-note-wrap').style.display = this.checked ? 'block' : 'none';
+        });
+
+        document.getElementById('clear-log').addEventListener('click', () => {
+            if (confirm('Clear all logged entries? This cannot be undone.')) {
+                saveEntries([]);
+                renderAll();
+            }
+        });
+
+        document.getElementById('save-goal').addEventListener('click', () => {
+            const val = parseFloat(document.getElementById('goal-input').value);
+            if (isNaN(val) || val <= 0) return;
+            localStorage.setItem(GOAL_KEY, String(val));
+            renderGoal();
+            showToast('Goal saved!');
+        });
+
+        document.getElementById('export-csv').addEventListener('click', () => {
+            const entries = loadEntries();
+            if (entries.length === 0) {
+                showToast('Nothing to export yet');
+                return;
+            }
+            const rows = [['Date', 'Activity', 'Description', 'Miles', 'Estimated CO2 (lbs)', 'Accessibility Barrier?', 'Barrier Note']];
+            entries.forEach(e => {
+                rows.push([new Date(e.ts).toLocaleString(), labels[e.type] || e.type, e.desc || '', e.miles, e.co2.toFixed(2), e.barrier ? 'Yes' : 'No', e.barrierNote || '']);
+            });
+            const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'carboncount-log.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Voice input
+        var SpeechRecognitionApi = window.SpeechRecognition || window.webkitSpeechRecognition; // different browsers expose this under different names
+        var voiceBtn = document.getElementById('voice-btn');
+        if (SpeechRecognitionApi) {
+            var recognition = new SpeechRecognitionApi(); // creates one reusable recognizer instance
+            recognition.lang = 'en-US'; // sets the expected spoken language
+            recognition.interimResults = false; // only fires once the person has finished speaking, not word-by-word
+            recognition.addEventListener('result', function (e) {
+                var transcript = e.results[0][0].transcript; // pulls the best-guess text out of the recognition result
+                document.getElementById('activity-desc').value = transcript; // drops the spoken text straight into the field
+                voiceBtn.textContent = '🎤';
+            });
+            recognition.addEventListener('end', function () { voiceBtn.textContent = '🎤'; }); // resets the icon once listening stops
+            recognition.addEventListener('error', function () {
+                voiceBtn.textContent = '🎤';
+                showToast('Voice input didn\'t catch that — try again');
+            });
+            voiceBtn.addEventListener('click', function () {
+                voiceBtn.textContent = '🔴'; // shows a recording indicator while listening
+                recognition.start(); // opens the microphone and starts listening for speech
+            });
+        } else {
+            voiceBtn.addEventListener('click', function () {
+                showToast('Voice input is not supported in this browser');
+            });
+        }
+
+        renderAll();
+    </script>
+
+</body>
+</html>

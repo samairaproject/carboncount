@@ -1,0 +1,6 @@
+# Email printouts contain family email addresses - never publish them
+*.pdf
+
+.DS_Store
+Thumbs.db
+desktop.ini

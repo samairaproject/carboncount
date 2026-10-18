@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<!-- Declares this document as HTML5 -->
+<html lang="en">
+<!-- Root element, lang="en" tells browsers/screen readers the page is in English -->
+<head>
+    <meta charset="UTF-8">
+    <!-- Sets the character encoding so special characters and emoji render correctly -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Makes the page show at the device's real width for responsive/mobile layouts -->
+    <title>CarbonCount - About</title>
+    <!-- Sets the browser tab title -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Loads the external stylesheet shared by every page on the site -->
+</head>
+<body>
+
+    <header class="site-header">
+        <!-- Semantic header element -->
+        <div class="cloud-band" aria-hidden="true">
+            <!-- Decorative-only div -->
+            <svg viewBox="0 0 900 60" preserveAspectRatio="none" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <!-- The scalable vector graphic that draws the animated cloud strip -->
+                <defs>
+                    <!-- Reusable puffy cloud -->
+                    <g id="cloud-shape">
+                        <!-- Groups the shapes below into one named, reusable cloud unit -->
+                        <ellipse cx="0" cy="18" rx="28" ry="10"/>
+                        <!-- The cloud's flat, wide base shape -->
+                        <circle cx="-18" cy="12" r="11"/>
+                        <!-- Left puff of the cloud -->
+                        <circle cx="0" cy="7" r="13"/>
+                        <!-- Top-center puff, the tallest part of the cloud -->
+                        <circle cx="18" cy="12" r="11"/>
+                        <!-- Right puff of the cloud -->
+                        <circle cx="30" cy="16" r="8"/>
+                        <!-- Small outer puff on the right edge -->
+                        <circle cx="-30" cy="16" r="8"/>
+                        <!-- Small outer puff on the left edge -->
+                    </g>
+                </defs>
+                <!-- Back cloud layer drifts slowly -->
+                <g class="drift-slow" fill="#eaf5fb" opacity="0.6">
+                    <!-- Group of faint, distant clouds -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="80" y="4"/>
+                    <!-- Places one copy of the cloud shape at this x/y position -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="340" y="-6"/>
+                    <!-- Another copy of the same cloud shape, repositioned -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="620" y="8"/>
+                    <!-- Another copy of the same cloud shape, repositioned -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="880" y="-4"/>
+                    <!-- Another copy of the same cloud shape, repositioned -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1160" y="4"/>
+                    <!-- Extra copy positioned off to the right so the loop looks continuous -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1420" y="-6"/>
+                    <!-- Extra copy positioned off to the right so the loop looks continuous -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1700" y="8"/>
+                    <!-- Extra copy so the loop looks continuous -->
+                </g>
+                <!-- Front cloud layer drifts forward and sits lower -->
+                <g class="drift" fill="#ffffff">
+                    <!-- Group of brighter, closer clouds -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="150" y="16"/>
+                    <!-- Places one copy of the cloud shape at this x/y position -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="470" y="20"/>
+                    <!-- Another copy of the same cloud shape, repositioned -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="760" y="14"/>
+                    <!-- Another copy of the same cloud shape, repositioned -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1050" y="16"/>
+                    <!-- Extra copy positioned off to the right so the loop looks continuous -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1370" y="20"/>
+                    <!-- Extra copy positioned off to the right so the loop looks continuous -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1660" y="14"/>
+                    <!-- Extra copy positioned off to the right so the loop looks continuous -->
+                </g>
+            </svg>
+        </div>
+
+        <nav class="top-nav" aria-label="Main Navigation">
+            <!-- Semantic nav element -->
+            <a class="brand" href="index.html">🌲 CarbonCount</a>
+            <!-- Site logo/name, links back to the homepage -->
+            <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle navigation menu">☰</button>
+            <!-- Hamburger(looks like it :)) button, only visible on narrow screens; toggled by site.js -->
+            <div id="nav-menu" class="nav-menu">
+                <!-- Container for the nav links; site.js adds the .open class on mobile when toggled -->
+                <a href="index.html">Home</a>
+                <!-- Link to the homepage -->
+                <a href="about.html" class="active">About</a>
+                <!-- Link to this page class="active" highlights it in the nav -->
+                <a href="profile.html">Profile</a>
+                <!-- Link to the Profile page -->
+                <a href="log.html">Daily Log</a>
+                <!-- Link to the Daily Log page -->
+                <a href="route.html">Route Planner</a>
+                <!-- Link to the Route Planner page -->
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-section">
+        <!-- Semantic main element holds this page's unique content -->
+        <p class="eyebrow">About CarbonCount</p>
+        <!-- Small uppercase label sitting above the main heading -->
+        <h2>An everyday tracker that treats accessibility as part of the climate answer</h2>
+        <!-- Page's main heading -->
+        <p class="lede">CarbonCount is a lightweight travel-logging app built on a simple idea: the "greener" choice only counts if you can actually take it. Most carbon-tracking tools assume everyone can walk to the train, bike across town, or take the stairs when an elevator is down. This app starts from a different assumption — that low-carbon transportation has to be accessible transportation, or it isn't really a solution at all.</p>
+        <!-- Intro paragraph, styled larger via the .lede class -->
+
+        <nav class="quick-jump" aria-label="On this page">
+            <!-- Small in-page jump nav so a long, merged page is still easy to skim/navigate -->
+            <a href="#the-app">↓ About the app</a>
+            <a href="#the-problem">↓ The problem it solves</a>
+            <a href="#faq">↓ FAQ</a>
+        </nav>
+
+        <h3 id="the-app" class="section-marker">About the app</h3>
+        <!-- Anchor target for the quick-jump link above -->
+
+        <div class="card">
+            <!-- Styled content card: what the app does -->
+            <h3>What the app does</h3>
+            <!-- Card heading -->
+            <p>CarbonCount gives you three simple tools:</p>
+            <!-- Short intro line before the feature list -->
+            <ul>
+                <!-- Unordered list of the three core features -->
+                <li><strong>Daily Log</strong> — record each trip you take, describe it in your own words, enter the miles, and see an estimated carbon impact build up over the day.</li>
+                <!-- Describes the Daily Log feature -->
+                <li><strong>Profile</strong> — save a short bio, note any accessibility or mobility needs you want the app to account for, and flag which lower-carbon travel modes actually work for you.</li>
+                <!-- Describes the Profile feature -->
+                <li><strong>The Problem, below</strong> — background on why climate impact and accessibility are connected, not separate issues.</li>
+                <!-- Describes The Problem section, now further down this same page -->
+            </ul>
+            <p>Right now, everything you enter is saved locally in your browser — nothing is uploaded to a server. That keeps the current version simple and private, though it also means your data won't follow you to a different device yet.</p>
+            <!-- Explains the current local-storage-only data model -->
+        </div>
+
+        <div class="card">
+            <!-- Styled content card: the accessibility/carbon comparison table -->
+            <h3>Accessible Route Efficiency Comparison</h3>
+            <!-- Card heading -->
+            <p>Not every low-carbon route is available to every rider. This comparison shows why "just take transit" isn't always simple advice — infrastructure gaps can quietly remove the greenest option for wheelchair and powerchair users.</p>
+            <!-- Sets up why the table below matters -->
+            <div class="table-scroll">
+                <!-- Wraps the table so it can scroll horizontally on very small screens instead of breaking the layout -->
+                <table class="data-table">
+                    <!-- Fulfills Requirement 6 (Data Table) -->
+                    <thead>
+                        <!-- Table header section -->
+                        <tr>
+                            <th scope="col">Route Option</th>
+                            <!-- Column header; scope="col" ties it to the column for screen readers -->
+                            <th scope="col">Carbon Footprint</th>
+                            <!-- Column header; scope="col" ties it to the column for screen readers -->
+                            <th scope="col">Wheelchair Accessible?</th>
+                            <!-- Column header; scope="col" ties it to the column for screen readers -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table body rows -->
+                        <tr>
+                            <td>Bus Route 4</td>
+                            <!-- Row 1, column 1: route name -->
+                            <td>Low Carbon</td>
+                            <!-- Row 1, column 2: carbon footprint rating -->
+                            <td>Yes (Ramp Equipped)</td>
+                            <!-- Row 1, column 3: accessibility status -->
+                        </tr>
+                        <tr>
+                            <td>Subway Line A</td>
+                            <!-- Row 2, column 1: route name -->
+                            <td>Very Low Carbon</td>
+                            <!-- Row 2, column 2: carbon footprint rating -->
+                            <td>No (Elevator Outage)</td>
+                            <!-- Row 2, column 3: accessibility status, illustrating the core problem -->
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="margin-top:10px; font-size:0.9rem; color:#5a6b62;">Sample data shown for illustration. A future version of this app could pull live transit accessibility status automatically.</p>
+            <!-- Disclaimer clarifying the table uses sample, not live, data -->
+        </div>
+
+        <div class="card">
+            <!-- Styled content card: explains the CO2 math -->
+            <h3>How the numbers work</h3>
+            <!-- Card heading -->
+            <p>Your Daily Log gives a carbon estimate per mile for each travel mode, based on published national averages: driving is estimated at about 0.89 lbs CO₂ per mile (EPA average for a typical passenger vehicle), public transit at about 0.45 lbs (FTA national average across bus and rail), accessible paratransit-style routing at about 0.10 lbs, and walking or biking at effectively zero tailpipe emissions. See the "How we calculate this" box on the Route Planner page for the full formula and sources. These are still simplified averages meant to show relative impact, not a precise personal carbon audit.</p>
+            <!-- Explains the fixed per-mile factors used in log.html and route.html -->
+        </div>
+
+        <div class="card">
+            <!-- Styled content card: roadmap -->
+            <h3>What's next</h3>
+            <!-- Card heading -->
+            <p>This is an early, working version of the app. Planned next steps include real accounts so your log and profile sync across devices, live accessibility data for transit routes, and weekly summaries that connect your logged trips to regional climate and transit policy — the kind of context you can read about now in <a href="#the-problem">The Problem</a>, below.</p>
+            <!-- Fulfills Accessibility Feature (Descriptive Links) -->
+        </div>
+
+        <h3 id="the-problem" class="section-marker">The problem it solves</h3>
+        <!-- Anchor target for the quick-jump link above; this section is the former about-problem.html page -->
+
+        <p class="eyebrow">Why this app exists</p>
+        <!-- Small uppercase label sitting above this section's heading -->
+        <h2>The Climate Crisis &amp; Accessible Infrastructure</h2>
+        <!-- Section heading -->
+        <p class="lede">Climate change is usually discussed in terms of global temperatures and emissions curves. But at the street level, it shows up as something much more concrete: which routes are open, which elevators are running, and which neighborhoods get rebuilt first after a storm.</p>
+        <!-- Intro paragraph, styled larger via the .lede class -->
+
+        <div class="card">
+            <!-- Styled content card: first talking point -->
+            <h3>Two problems, one map</h3>
+            <!-- Card heading -->
+            <p>Transportation is a major source of household carbon emissions, and shifting people toward buses, trains, walking, and biking is one of the most effective ways to cut it. But that shift only works if the lower-carbon option is actually usable. A subway line with a broken elevator isn't a green choice for a wheelchair user — it's simply unavailable, pushing that trip back onto a car. Every accessibility gap in low-carbon infrastructure quietly increases emissions by removing an option, not just an inconvenience.</p>
+            <!-- Card body text -->
+        </div>
+
+        <div class="card">
+            <!-- Styled content card: second talking point -->
+            <h3>Instability raises the stakes</h3>
+            <!-- Card heading -->
+            <p>When regional or national instability disrupts funding, maintenance, or planning, transit systems tend to defer the repairs that keep them accessible first — ramps, elevators, curb cuts, and paratransit services are often the first budget lines cut and the last ones restored. That means climate vulnerability doesn't fall evenly. Disabled residents can be left with fewer safe evacuation routes during extreme weather, longer waits for accessible transit during service disruptions, and less flexibility to adapt when a familiar route suddenly stops working.</p>
+            <!-- Card body text -->
+        </div>
+
+        <div class="card">
+            <!-- Styled content card: third talking point -->
+            <h3>Why CarbonCount treats them together</h3>
+            <!-- Card heading -->
+            <p>Most climate apps track emissions. Most accessibility tools track routes. Very few do both at once — which means the people most affected by infrastructure gaps are often invisible in the data used to justify new climate policy. By logging trips that include accessibility context, this app aims to make that overlap visible: not just "how much carbon did this city save," but "who was actually able to make the low-carbon choice, and who wasn't."</p>
+            <!-- Card body text -->
+        </div>
+
+        <div class="card">
+            <!-- Styled content card: what the reader can actually do -->
+            <h3>What you can do here</h3>
+            <!-- Card heading -->
+            <p>Use your <a href="profile.html">Profile</a> to note the accessibility needs that matter for your own routing, and use the <a href="log.html">Daily Log</a> to track which trips you were able to make sustainably versus which ones defaulted to driving. Over time, patterns in that data are exactly the kind of evidence that can support arguments for better-maintained, more accessible low-carbon infrastructure.</p>
+            <!-- Card body text with descriptive internal links to Profile and Daily Log -->
+        </div>
+
+        <!-- Further Reading: real external hyperlinks with descriptive text for continued research -->
+        <div class="card">
+            <!-- Styled content card: external resource links -->
+            <h3>Further Reading</h3>
+            <!-- Card heading -->
+            <ul>
+                <!-- Unordered list of external articles -->
+                <li><a href="https://www.ipcc.ch/report/ar6/wg2/" target="_blank" rel="noopener">IPCC: Climate Change 2022 — Impacts, Adaptation and Vulnerability</a></li>
+                <!-- External link; target="_blank" opens a new tab, rel="noopener" blocks the new tab from accessing this page -->
+                <li><a href="https://www.un.org/development/desa/disabilities/envision2030.html" target="_blank" rel="noopener">United Nations: Envision2030 — Disability and the SDGs</a></li>
+                <!-- External link; target="_blank" opens a new tab, rel="noopener" blocks the new tab from accessing this page -->
+                <li><a href="https://www.c40.org/" target="_blank" rel="noopener">C40 Cities: Global Network on Urban Climate Action</a></li>
+                <!-- External link; target="_blank" opens a new tab, rel="noopener" blocks the new tab from accessing this page -->
+            </ul>
+        </div>
+
+        <div class="card" id="faq">
+            <!-- Styled content card: FAQ accordion -->
+            <h3>Frequently Asked Questions</h3>
+            <!-- Card heading -->
+            <details class="faq-item">
+                <!-- Native, no-JS-needed expand/collapse element -->
+                <summary>Is my data private?</summary>
+                <!-- Always-visible question; clicking it toggles the answer below -->
+                <p>Yes. Everything you enter — your bio, accessibility notes, and logged trips — is stored only in your browser's local storage. Nothing is sent to a server, and nothing is shared with anyone.</p>
+                <!-- Answer text, hidden until the <details> is opened -->
+            </details>
+            <details class="faq-item">
+                <summary>Will my log carry over to a new device or browser?</summary>
+                <p>Not yet. Since data is stored locally, clearing your browser data or switching devices will reset your log. Account-based syncing is on the roadmap.</p>
+            </details>
+            <details class="faq-item">
+                <summary>How accurate are the CO₂ estimates?</summary>
+                <p>They're simplified per-mile averages meant to show relative impact between travel modes, not a precise personal carbon audit. Think of them as directional, not exact.</p>
+            </details>
+            <details class="faq-item">
+                <summary>Do I have to share accessibility information?</summary>
+                <p>No. Every field on your Profile page is optional, including the "Prefer not to say" option in the accessibility checklist. Sharing it just helps the app's suggestions fit you better.</p>
+            </details>
+            <details class="faq-item">
+                <summary>Can I get my data back out of the app?</summary>
+                <p>Yes — the Daily Log page has an "Export as CSV" button that downloads all of your logged trips as a spreadsheet-ready file.</p>
+            </details>
+        </div>
+    </main>
+
+    <footer>
+        <!-- Semantic footer element -->
+        <p>&copy; 2026 CarbonCount</p>
+        <!-- Copyright line; site.js inserts the subscribe form and share button above this -->
+    </footer>
+
+    <script src="site.js"></script>
+    <!-- Loads the shared site script (nav toggle, dark mode, accessibility panel, search, footer extras) -->
+</body>
+</html>

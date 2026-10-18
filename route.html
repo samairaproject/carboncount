@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarbonCount - Route Planner</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Leaflet's stylesheet, required for the map tiles/markers to display correctly -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="cloud-band" aria-hidden="true">
+            <svg viewBox="0 0 900 60" preserveAspectRatio="none" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <defs>
+                    <!-- Reusable puffy cloud built from overlapping circles, placed repeatedly below with <use> -->
+                    <g id="cloud-shape">
+                        <ellipse cx="0" cy="18" rx="28" ry="10"/>
+                        <circle cx="-18" cy="12" r="11"/>
+                        <circle cx="0" cy="7" r="13"/>
+                        <circle cx="18" cy="12" r="11"/>
+                        <circle cx="30" cy="16" r="8"/>
+                        <circle cx="-30" cy="16" r="8"/>
+                    </g>
+                </defs>
+                <!-- Back cloud layer drifts slowly in reverse for a parallax depth effect -->
+                <g class="drift-slow" fill="#eaf5fb" opacity="0.6">
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="80" y="4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="340" y="-6"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="620" y="8"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="880" y="-4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1160" y="4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1420" y="-6"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1700" y="8"/>
+                </g>
+                <!-- Front cloud layer drifts forward and sits lower, closer to the horizon -->
+                <g class="drift" fill="#ffffff">
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="150" y="16"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="470" y="20"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="760" y="14"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1050" y="16"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1370" y="20"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1660" y="14"/>
+                </g>
+            </svg>
+        </div>
+
+        <nav class="top-nav" aria-label="Main Navigation">
+            <a class="brand" href="index.html">🌲 CarbonCount</a>
+            <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle navigation menu">☰</button>
+                        <div id="nav-menu" class="nav-menu">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <!-- Link to the About page (merged About App + The Problem) -->
+                <a href="profile.html">Profile</a>
+                <a href="log.html">Daily Log</a>
+                <a href="route.html" class="active">Route Planner</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-section">
+        <p class="eyebrow">Get there greener</p>
+        <h2>Route Planner</h2>
+        <p class="lede">Enter a starting point and a destination and CarbonCount compares driving, cycling, walking, and an estimated transit option side by side, then flags whichever is realistically the lowest-carbon choice for that specific trip. All routes load at the same time, so this is usually a few seconds, not a long wait.</p>
+        <p style="font-size:0.85rem; color:#4f5f57;">This uses free public OpenStreetMap routing services, so results depend on OSM's map data and the service being online — it's a demo-quality routing feature, not a production-grade GPS app.</p>
+
+        <div class="card">
+            <!-- Explainer box: shows the actual formula and sources behind the CO2 numbers, so anyone can check or reuse it -->
+            <details class="faq-item" open>
+                <summary>🧮 How we calculate these CO₂ numbers</summary>
+                <p>For each mode, we multiply the route's distance by a fixed emissions factor:</p>
+                <p style="font-family: monospace; background:#f2f7f3; padding:8px 10px; border-radius:6px; display:inline-block;">Estimated CO₂ (lbs) = Distance (miles) × Emissions factor (lbs CO₂ per passenger-mile)</p>
+                <p>The factors we use are real, published national averages — not made up placeholders:</p>
+                <ul style="margin:8px 0; padding-left:20px;">
+                    <li><strong>Driving: 0.89 lbs CO₂/mile</strong> — the EPA's figure for a typical U.S. passenger vehicle (404 g CO₂/mile), based on ~22.2 mpg average fuel economy and 8,887g of CO₂ per gallon of gasoline burned. <a href="https://www.epa.gov/greenvehicles/greenhouse-gas-emissions-typical-passenger-vehicle" target="_blank" rel="noopener">Source: US EPA</a></li>
+                    <li><strong>Public transit: 0.45 lbs CO₂/passenger-mile</strong> — the Federal Transit Administration's national average across bus and rail transit, versus 0.96 lbs/mile for a single-occupancy car. It's a blended national figure since we don't have real-time data on your specific bus or train line. <a href="https://www.apta.com/wp-content/uploads/Standards_Documents/APTA-SUDS-CC-RP-001-09_Rev-1.pdf" target="_blank" rel="noopener">Source: FTA, via APTA</a></li>
+                    <li><strong>Walking &amp; cycling: 0 lbs CO₂/mile</strong> — no tailpipe emissions. This covers direct emissions only, not the lifecycle footprint of manufacturing a bike or the food calories burned to power the trip.</li>
+                </ul>
+                <p>Distances come from real routed directions (not straight-line "as the crow flies" distance) via OpenStreetMap's OSRM routing engine. Two honest caveats: these are national averages, so your actual car or transit line could be cleaner or dirtier than the average; and these are tailpipe/tank-to-wheel numbers, not full lifecycle emissions (manufacturing, grid mix for electric transit, etc.).</p>
+                <p style="font-size:0.85rem; color:#4f5f57;">Want to calculate this yourself for your own trip? Take your route's mileage and multiply it by the factor for your mode above — that's the exact math this page runs.</p>
+            </details>
+        </div>
+
+        <section class="card">
+            <form class="route-form" id="route-form">
+                <div class="route-form-row">
+                    <div class="form-group">
+                        <label for="from-input">From</label>
+                        <input type="text" id="from-input" placeholder="Starting address or place">
+                    </div>
+                    <button type="button" id="use-location" class="secondary">📍 Use my location</button>
+                </div>
+                <div class="form-group">
+                    <label for="to-input">To</label>
+                    <input type="text" id="to-input" placeholder="Destination address or place" required>
+                </div>
+                <button type="submit">Find Routes</button>
+            </form>
+            <p class="route-status" id="route-status"></p>
+
+            <!-- Leaflet renders the interactive map into this div once routes are found -->
+            <div id="route-map"></div>
+
+            <!-- Innovative feature: QR code linking to real turn-by-turn navigation, so a phone can scan and go -->
+            <div class="route-results" id="route-results"></div>
+            <div id="qr-box" hidden></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 CarbonCount</p>
+    </footer>
+
+    <script src="site.js"></script>
+    <!-- Leaflet's JS library, used below to draw the interactive map and route lines -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        // Carbon estimate factors, in lbs of CO2 per passenger-mile.
+        // Driving: EPA's national average tailpipe rate for a typical passenger vehicle is 404g CO2/mile (0.89 lb/mile),
+        //          based on ~22.2 mpg average fuel economy and 8,887g CO2 per gallon of gasoline burned.
+        //          Source: US EPA, "Greenhouse Gas Emissions from a Typical Passenger Vehicle" (epa.gov/greenvehicles).
+        // Transit: FTA's national average across bus + rail transit is 0.45 lb CO2/passenger-mile (vs. 0.96 lb/mile
+        //          for a single-occupancy car). This is a blended national figure, not specific to any one city or line.
+        //          Source: Federal Transit Administration (2010), cited in APTA's "Quantifying Greenhouse Gas Emissions from Transit."
+        // Cycling/Walking: ~0 lb tailpipe CO2/mile — these numbers cover direct (tailpipe) emissions only, not the
+        //          lifecycle emissions of manufacturing a bike or growing the extra food calories burned.
+        // See the "How we calculate this" box below for the full breakdown and sources.
+        var CO2_PER_MILE = { driving: 0.89, transit: 0.45, cycling: 0.00, walking: 0.00 };
+
+        var map = null;               // holds the Leaflet map instance once created
+        var routeLayers = [];         // keeps track of drawn route lines so they can be cleared between searches
+        var markers = [];             // keeps track of start/end markers so they can be cleared between searches
+
+        // Turns a free-text place name into {lat, lon} using OpenStreetMap's free Nominatim geocoder.
+        async function geocode(query) {
+            var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(query);
+            var res = await fetch(url, { headers: { 'Accept': 'application/json' } }); // asks Nominatim for a JSON search result
+            var data = await res.json();
+            if (!data.length) throw new Error('Could not find location: ' + query); // no match means the geocoder found nothing usable
+            return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), label: data[0].display_name };
+        }
+
+        // Asks a public OSRM routing server for a route between two points for a given travel profile.
+        async function getRoute(profile, from, to) {
+            // Each travel mode is served by a different public OSRM instance hosted by OpenStreetMap Germany.
+            var hosts = {
+                driving: 'https://routing.openstreetmap.de/routed-car/route/v1/driving/',
+                cycling: 'https://routing.openstreetmap.de/routed-bike/route/v1/bike/',
+                walking: 'https://routing.openstreetmap.de/routed-foot/route/v1/foot/'
+            };
+            var coords = from.lon + ',' + from.lat + ';' + to.lon + ',' + to.lat; // OSRM expects "lon,lat" pairs
+            // steps=true asks OSRM for the turn-by-turn maneuver list, which powers the mini-GPS directions feature below.
+            var url = hosts[profile] + coords + '?overview=full&geometries=geojson&steps=true';
+            var res = await fetch(url);
+            var data = await res.json();
+            if (data.code !== 'Ok' || !data.routes || !data.routes.length) {
+                throw new Error('No ' + profile + ' route found'); // the server responded but couldn't build a route for this profile
+            }
+            var route = data.routes[0];
+            return {
+                miles: route.distance / 1609.34,              // OSRM returns meters; convert to miles
+                minutes: route.duration / 60,                 // OSRM returns seconds; convert to minutes
+                geojsonCoords: route.geometry.coordinates,      // [lon, lat] pairs describing the path, used to draw the line
+                steps: extractSteps(route)                      // plain-language turn-by-turn directions, used by the mini-GPS panel
+            };
+        }
+
+        // Flattens OSRM's leg/step structure into a simple list of {text, distanceMeters, coord} directions.
+        // There's only ever one leg here since planRoute only ever geocodes two points (start + destination).
+        function extractSteps(route) {
+            if (!route.legs || !route.legs.length) return [];
+            var rawSteps = route.legs[0].steps || [];
+            return rawSteps.map(function (step) {
+                return {
+                    text: formatManeuver(step),
+                    distanceMeters: step.distance,
+                    // OSRM gives maneuver locations as [lon, lat]; flip to [lat, lon] for Leaflet/haversine use.
+                    coord: [step.maneuver.location[1], step.maneuver.location[0]]
+                };
+            });
+        }
+
+        // Turns one OSRM maneuver object into a plain-English instruction, e.g. "Turn left onto Grove St".
+        // OSRM's maneuver "type" values are a fixed vocabulary (turn, depart, arrive, roundabout, etc.) — this
+        // covers all of them with a sensible fallback for anything unrecognized.
+        function formatManeuver(step) {
+            var m = step.maneuver;
+            var type = m.type;
+            var modifier = m.modifier ? m.modifier.replace(/_/g, ' ') : '';
+            var streetName = step.name && step.name.trim() ? step.name.trim() : '';
+            var onto = streetName ? ' onto ' + streetName : '';
+            var on = streetName ? ' on ' + streetName : '';
+
+            switch (type) {
+                case 'depart': return ('Head ' + modifier).trim() + on;
+                case 'arrive': return 'Arrive at your destination' + (modifier ? ' (' + modifier + ')' : '');
+                case 'turn': return ('Turn ' + modifier).trim() + onto;
+                case 'new name': return 'Continue' + onto;
+                case 'continue': return ('Continue ' + modifier).trim() + onto;
+                case 'merge': return ('Merge ' + modifier).trim() + onto;
+                case 'on ramp': return ('Take the ramp ' + modifier).trim() + onto;
+                case 'off ramp': return ('Take the exit ' + modifier).trim() + onto;
+                case 'fork': return ('Keep ' + modifier).trim() + (streetName ? ' toward ' + streetName : '');
+                case 'end of road': return ('Turn ' + modifier).trim() + onto;
+                case 'roundabout':
+                case 'rotary': return 'Enter the roundabout' + (m.exit ? ', take exit ' + m.exit : '') + onto;
+                case 'roundabout turn': return ('At the roundabout, turn ' + modifier).trim();
+                case 'exit roundabout':
+                case 'exit rotary': return 'Exit the roundabout' + onto;
+                case 'uturn': return 'Make a U-turn' + onto;
+                case 'notification': return streetName ? 'Continue' + on : 'Continue';
+                default: return (modifier ? 'Head ' + modifier : 'Continue') + on;
+            }
+        }
+
+        // Formats a distance in meters as a short, human-friendly string (feet for short hops, miles beyond that).
+        function formatDistance(meters) {
+            if (meters < 300) return Math.round(meters * 3.28084) + ' ft';
+            var miles = meters / 1609.34;
+            return miles < 0.1 ? Math.round(meters * 3.28084) + ' ft' : miles.toFixed(1) + ' mi';
+        }
+
+        // Straight-line distance between two lat/lon points, in meters (haversine formula).
+        // Used during live navigation to tell how close the person is to their next turn.
+        function haversineMeters(lat1, lon1, lat2, lon2) {
+            var R = 6371000; // Earth's radius in meters
+            var toRad = function (deg) { return deg * Math.PI / 180; };
+            var dLat = toRad(lat2 - lat1);
+            var dLon = toRad(lon2 - lon1);
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        // Removes any route lines and markers left over from a previous search before drawing new ones.
+        function clearMap() {
+            routeLayers.forEach(function (l) { map.removeLayer(l); });
+            markers.forEach(function (m) { map.removeLayer(m); });
+            routeLayers = [];
+            markers = [];
+        }
+
+        // Creates the Leaflet map the first time it's needed, using OpenStreetMap's free tile server.
+        function ensureMap() {
+            if (map) return;
+            map = L.map('route-map').setView([40.7178, -74.0431], 12); // starts centered on the Jersey City area
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        // Draws a colored line on the map for one route's path.
+        function drawRouteLine(geojsonCoords, color) {
+            var latlngs = geojsonCoords.map(function (c) { return [c[1], c[0]]; }); // GeoJSON is [lon, lat]; Leaflet wants [lat, lon]
+            var line = L.polyline(latlngs, { color: color, weight: 5, opacity: 0.75 }).addTo(map);
+            routeLayers.push(line);
+            return line;
+        }
+
+        // Main handler: geocodes both addresses, fetches all route profiles in parallel, and renders results.
+        async function planRoute(fromText, toText) {
+            stopNavigation(); // a fresh search invalidates any mini-GPS session from a previous route
+            var status = document.getElementById('route-status');
+            var resultsBox = document.getElementById('route-results');
+            resultsBox.innerHTML = '';
+            document.getElementById('qr-box').hidden = true;
+            status.innerHTML = '<span class="route-spinner"></span>Looking up locations…';
+
+            var fromPoint, toPoint;
+            try {
+                toPoint = await geocode(toText); // destination is always geocoded from the text field
+                fromPoint = fromText.trim()
+                    ? await geocode(fromText)      // starting point is geocoded if the person typed one
+                    : await getCurrentLocation();   // otherwise fall back to the browser's GPS location
+            } catch (err) {
+                status.textContent = err.message;
+                return;
+            }
+
+            status.innerHTML = '<span class="route-spinner"></span>Comparing driving, cycling, and walking…';
+            ensureMap();
+            clearMap();
+
+            // Marks both endpoints on the map so the person can see where the route starts and ends.
+            markers.push(L.marker([fromPoint.lat, fromPoint.lon]).addTo(map).bindPopup('Start'));
+            markers.push(L.marker([toPoint.lat, toPoint.lon]).addTo(map).bindPopup('Destination'));
+
+            var profiles = [
+                { key: 'driving', label: 'Driving', color: '#b23b3b' },
+                { key: 'cycling', label: 'Cycling', color: '#f4b942' },
+                { key: 'walking', label: 'Walking', color: '#2e6b4f' }
+            ];
+
+            // All three profiles are requested at the same time instead of one after another — this is the main
+            // speed fix, since waiting for each route in sequence was roughly tripling the total wait time.
+            var settled = await Promise.allSettled(
+                profiles.map(function (p) { return getRoute(p.key, fromPoint, toPoint); })
+            );
+
+            var options = [];
+            var drivingMiles = null; // remembered so the estimated-transit option below can reuse the driving distance
+            settled.forEach(function (result, i) {
+                var p = profiles[i];
+                if (result.status === 'fulfilled') {
+                    var route = result.value;
+                    if (p.key === 'driving') drivingMiles = route.miles;
+                    var co2 = route.miles * CO2_PER_MILE[p.key];
+                    options.push({ label: p.label, miles: route.miles, minutes: route.minutes, co2: co2, color: p.color, ok: true, key: p.key, steps: route.steps });
+                    drawRouteLine(route.geojsonCoords, p.color); // draws this mode's path on the map in its own color
+                } else {
+                    options.push({ label: p.label, ok: false, error: result.reason.message }); // records the failure so it can be shown, not silently dropped
+                }
+            });
+
+            // Adds a fourth, estimated public-transit option since OSRM has no transit profile to route with directly.
+            if (drivingMiles !== null) {
+                options.push({
+                    label: 'Public Transit (estimated)',
+                    miles: drivingMiles,
+                    minutes: null,
+                    co2: drivingMiles * CO2_PER_MILE.transit,
+                    ok: true,
+                    key: 'transit',
+                    estimated: true
+                });
+            }
+
+            // Fits the map view to show both endpoints and all drawn routes at once.
+            var bounds = L.latLngBounds([[fromPoint.lat, fromPoint.lon], [toPoint.lat, toPoint.lon]]);
+            map.fitBounds(bounds, { padding: [40, 40] });
+
+            renderResults(options);
+            renderQrCode(fromPoint, toPoint); // innovative feature: lets a phone scan and open real turn-by-turn navigation
+            status.textContent = 'From: ' + (fromPoint.label || 'Your location') + ' → To: ' + toPoint.label;
+        }
+
+        // Builds a scannable QR code that opens real Google Maps directions on whatever device scans it.
+        function renderQrCode(fromPoint, toPoint) {
+            var box = document.getElementById('qr-box');
+            var mapsUrl = 'https://www.google.com/maps/dir/?api=1&origin=' + fromPoint.lat + ',' + fromPoint.lon
+                + '&destination=' + toPoint.lat + ',' + toPoint.lon; // builds a real, working Google Maps link from the two points
+            var qrImgUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=' + encodeURIComponent(mapsUrl); // free QR-image generator, no key needed
+            box.innerHTML =
+                '<h4 style="margin:16px 0 6px;">📱 Scan for turn-by-turn navigation</h4>' +
+                '<img src="' + qrImgUrl + '" alt="QR code linking to Google Maps directions for this trip" width="140" height="140" style="border-radius:8px;">' +
+                '<p style="font-size:0.8rem; color:#4f5f57; margin-top:6px;">Opens this exact route in Google Maps on whatever device scans it.</p>';
+            box.hidden = false; // reveals the QR box now that it has content
+        }
+
+        // Small perk tags that make the zero-carbon options feel like a reward, not just a longer wait.
+        function perksFor(option) {
+            if (option.key === 'walking') {
+                var cal = Math.round(option.miles * 80); // rough average calories burned per mile walking
+                return '<span class="route-perk">🌿 Zero emissions</span><span class="route-perk">🔥 ~' + cal + ' cal burned</span><span class="route-perk">❤️ Health boost</span>';
+            }
+            if (option.key === 'cycling') {
+                var calBike = Math.round(option.miles * 40); // rough average calories burned per mile cycling
+                return '<span class="route-perk">🌿 Zero emissions</span><span class="route-perk">🔥 ~' + calBike + ' cal burned</span><span class="route-perk">💨 Often faster than parking a car</span>';
+            }
+            if (option.key === 'transit') {
+                return '<span class="route-perk">📖 Free hands to read or relax</span>';
+            }
+            return '';
+        }
+
+        // Builds the list of route option cards, highlighting the lowest-carbon successful option.
+        // Also stashes the raw options array in currentOptions so the directions/navigation click
+        // handlers (delegated, see below) can look up an option's steps by its index.
+        function renderResults(options) {
+            currentOptions = options;
+            var successful = options.filter(function (o) { return o.ok; });
+            var lowestCo2 = successful.length ? Math.min.apply(null, successful.map(function (o) { return o.co2; })) : null;
+
+            var box = document.getElementById('route-results');
+            box.innerHTML = options.map(function (o, i) {
+                if (!o.ok) {
+                    return '<div class="route-option"><span class="route-mode">' + o.label + '</span>' +
+                        '<span class="route-meta">Unavailable — ' + o.error + '</span></div>';
+                }
+                var isRecommended = o.co2 === lowestCo2;
+                var longNotice = (o.key !== 'driving' && o.key !== 'transit' && o.miles > 12) ? ' — long distance, may not be practical' : '';
+                var timeText = o.minutes !== null ? Math.round(o.minutes) + ' min · ' : '';
+                var hasSteps = o.steps && o.steps.length > 0;
+                return '<div class="route-option ' + (isRecommended ? 'recommended' : '') + (o.estimated ? ' estimated' : '') + '">' +
+                    '<div><span class="route-mode">' + o.label + '</span>' +
+                    '<div class="route-meta">' + o.miles.toFixed(1) + ' mi · ' + timeText + '~' + o.co2.toFixed(2) + ' lbs CO₂' + longNotice + '</div>' +
+                    '<div>' + perksFor(o) + '</div>' +
+                    (hasSteps ? '<button type="button" class="btn secondary directions-toggle" data-index="' + i + '">🧭 Directions</button>' + directionsPanel(o, i) : '') +
+                    '</div>' +
+                    (isRecommended ? '<span class="route-badge">Lowest carbon</span>' : '') +
+                    '</div>';
+            }).join('');
+        }
+
+        // Builds the (initially hidden) turn-by-turn panel for one route option: a scrollable step
+        // list plus Start/Stop Navigation buttons that drive the live "mini GPS" mode below.
+        function directionsPanel(option, index) {
+            var stepsHtml = option.steps.map(function (s, si) {
+                return '<li data-step="' + si + '"><span class="step-text">' + s.text + '</span>' +
+                    '<span class="step-dist">' + formatDistance(s.distanceMeters) + '</span></li>';
+            }).join('');
+            return '<div class="directions-panel" id="directions-panel-' + index + '" hidden>' +
+                '<div class="nav-current-step" id="nav-current-' + index + '" hidden>' +
+                '<div class="nav-current-instruction"></div>' +
+                '<div class="nav-current-distance"></div>' +
+                '</div>' +
+                '<div class="nav-controls">' +
+                '<button type="button" class="btn secondary nav-start-btn" data-index="' + index + '">▶ Start Navigation</button>' +
+                '<button type="button" class="btn secondary nav-stop-btn" data-index="' + index + '" hidden>⏹ Stop Navigation</button>' +
+                '</div>' +
+                '<ol class="directions-list" id="directions-list-' + index + '">' + stepsHtml + '</ol>' +
+                '</div>';
+        }
+
+        // Wraps the browser's Geolocation API in a promise and reverse-labels it as "Your location".
+        function getCurrentLocation() {
+            return new Promise(function (resolve, reject) {
+                if (!navigator.geolocation) {
+                    reject(new Error('This browser does not support location access — type a starting address instead.'));
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(
+                    function (pos) {
+                        resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude, label: 'Your current location' });
+                    },
+                    function () {
+                        reject(new Error('Location access was denied — type a starting address instead.'));
+                    }
+                );
+            });
+        }
+
+        // "Use my location" button fills the From field with a placeholder so the form visibly acknowledges the choice.
+        document.getElementById('use-location').addEventListener('click', function () {
+            document.getElementById('from-input').value = '';
+            document.getElementById('from-input').placeholder = 'Using your current location…';
+            getCurrentLocation()
+                .then(function (loc) { document.getElementById('from-input').placeholder = 'Using your current location ✓'; })
+                .catch(function (err) { document.getElementById('route-status').textContent = err.message; });
+        });
+
+        // ---------- Mini GPS: live turn-by-turn navigation ----------
+        // currentOptions holds the most recently rendered route options, so click handlers below can
+        // find the right steps by index. navWatchId/navState track an in-progress navigation session.
+        var currentOptions = [];
+        var navWatchId = null;
+        var navState = null; // { index, steps, currentStep, userMarker }
+
+        // Starts live navigation for the route option at the given index: watches the browser's real
+        // GPS position, tracks progress toward the next turn, and auto-advances the step list as the
+        // person moves — the actual "mini GPS" behavior.
+        function startNavigation(index) {
+            if (!navigator.geolocation) {
+                alert('Live navigation needs location access, which this browser doesn\'t support.');
+                return;
+            }
+            var option = currentOptions[index];
+            if (!option || !option.steps || !option.steps.length) return;
+            stopNavigation(); // clear out any previous session first
+
+            navState = { index: index, steps: option.steps, currentStep: 0, userMarker: null };
+
+            var currentBox = document.getElementById('nav-current-' + index);
+            if (currentBox) currentBox.hidden = false;
+            setNavButtons(index, true);
+            highlightStep(index, 0);
+            announceStep(option.steps[0].text); // read the first instruction aloud right away
+
+            navWatchId = navigator.geolocation.watchPosition(handlePositionUpdate, handleNavError, {
+                enableHighAccuracy: true,
+                maximumAge: 5000,
+                timeout: 15000
+            });
+        }
+
+        // Stops live navigation: clears the geolocation watch, removes the "you are here" marker, and
+        // resets the Start/Stop buttons on whichever panel was navigating.
+        function stopNavigation() {
+            if (navWatchId !== null) {
+                navigator.geolocation.clearWatch(navWatchId);
+                navWatchId = null;
+            }
+            if (navState) {
+                if (navState.userMarker && map) map.removeLayer(navState.userMarker);
+                setNavButtons(navState.index, false);
+                var currentBox = document.getElementById('nav-current-' + navState.index);
+                if (currentBox) currentBox.hidden = true;
+            }
+            navState = null;
+        }
+
+        // Shows/hides the Start vs. Stop Navigation buttons for one panel.
+        function setNavButtons(index, isNavigating) {
+            var startBtn = document.querySelector('.nav-start-btn[data-index="' + index + '"]');
+            var stopBtn = document.querySelector('.nav-stop-btn[data-index="' + index + '"]');
+            if (startBtn) startBtn.hidden = isNavigating;
+            if (stopBtn) stopBtn.hidden = !isNavigating;
+        }
+
+        // Fires on every GPS update while navigating: moves the "you are here" dot, measures distance
+        // to the next maneuver, advances to the next step once close enough, and updates the display.
+        function handlePositionUpdate(pos) {
+            if (!navState) return;
+            var lat = pos.coords.latitude;
+            var lon = pos.coords.longitude;
+
+            if (!navState.userMarker) {
+                navState.userMarker = L.circleMarker([lat, lon], {
+                    radius: 8, color: '#ffffff', weight: 2, fillColor: '#2e6b4f', fillOpacity: 1
+                }).addTo(map).bindPopup('You are here');
+            } else {
+                navState.userMarker.setLatLng([lat, lon]);
+            }
+
+            var step = navState.steps[navState.currentStep];
+            var distToStep = haversineMeters(lat, lon, step.coord[0], step.coord[1]);
+
+            // Close enough to this maneuver (and it isn't the final "arrive" step) → move to the next one.
+            var ARRIVAL_RADIUS_METERS = 30;
+            if (distToStep < ARRIVAL_RADIUS_METERS && navState.currentStep < navState.steps.length - 1) {
+                navState.currentStep++;
+                step = navState.steps[navState.currentStep];
+                distToStep = haversineMeters(lat, lon, step.coord[0], step.coord[1]);
+                highlightStep(navState.index, navState.currentStep);
+                announceStep(step.text);
+            }
+
+            updateNavDisplay(navState.index, step.text, distToStep);
+        }
+
+        // Geolocation errors during navigation (permission revoked mid-session, signal loss, etc.).
+        function handleNavError(err) {
+            var status = document.getElementById('route-status');
+            status.textContent = 'Navigation paused — ' + (err.message || 'location signal lost') + '.';
+        }
+
+        // Updates the big "current instruction" readout above the step list.
+        function updateNavDisplay(index, instructionText, distanceMeters) {
+            var box = document.getElementById('nav-current-' + index);
+            if (!box) return;
+            box.querySelector('.nav-current-instruction').textContent = instructionText;
+            box.querySelector('.nav-current-distance').textContent = 'in ' + formatDistance(distanceMeters);
+        }
+
+        // Marks one step as "active" in the directions list (bold + highlighted) and scrolls it into view.
+        function highlightStep(index, stepIndex) {
+            var list = document.getElementById('directions-list-' + index);
+            if (!list) return;
+            list.querySelectorAll('li').forEach(function (li) { li.classList.remove('active'); });
+            var activeLi = list.querySelector('li[data-step="' + stepIndex + '"]');
+            if (activeLi) {
+                activeLi.classList.add('active');
+                activeLi.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        }
+
+        // Speaks a turn-by-turn instruction aloud using the browser's built-in text-to-speech, the
+        // same API the site's accessibility "Read this page aloud" button uses.
+        function announceStep(text) {
+            if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
+            speechSynthesis.cancel(); // don't let instructions queue up and stack
+            speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+        }
+
+        // One delegated listener handles clicks for every route option's Directions/Start/Stop buttons,
+        // since those buttons are (re)created by renderResults() on every new search.
+        document.getElementById('route-results').addEventListener('click', function (e) {
+            var toggleBtn = e.target.closest('.directions-toggle');
+            if (toggleBtn) {
+                var panel = document.getElementById('directions-panel-' + toggleBtn.dataset.index);
+                if (panel) panel.hidden = !panel.hidden;
+                return;
+            }
+            var startBtn = e.target.closest('.nav-start-btn');
+            if (startBtn) { startNavigation(parseInt(startBtn.dataset.index, 10)); return; }
+            var stopBtn = e.target.closest('.nav-stop-btn');
+            if (stopBtn) { stopNavigation(); return; }
+        });
+
+        // Stop navigation cleanly if the person leaves the page mid-route.
+        window.addEventListener('beforeunload', stopNavigation);
+
+        // Form submit kicks off the full geocode-and-compare flow above.
+        document.getElementById('route-form').addEventListener('submit', function (e) {
+            e.preventDefault(); // stops the page from reloading on submit
+            var from = document.getElementById('from-input').value;
+            var to = document.getElementById('to-input').value;
+            if (!to.trim()) return;
+            planRoute(from, to);
+        });
+    </script>
+
+</body>
+</html>

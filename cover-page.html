@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<!-- Declares this document as HTML5 -->
+<html lang="en">
+<!-- Root element, lang="en" tells browsers/screen readers the page is in English -->
+<head>
+    <meta charset="UTF-8">
+    <!-- Sets the character encoding so special characters and emoji render correctly -->
+    <!-- Fulfills Requirement 2 (Responsive Layout) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Makes the page render at the device's real width for responsive/mobile layouts -->
+    <title>CarbonCount — Cover Page</title>
+    <!-- Sets the browser tab title -->
+    <!-- Fulfills Requirement 3 (External CSS) -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Loads the external stylesheet shared by every page on the site -->
+</head>
+<body>
+
+    <!-- Fulfills Requirement 1 (Semantic HTML) -->
+    <header class="site-header">
+        <!-- Semantic header element wraps the cloud graphic, nav bar, and hero banner -->
+        <div class="cloud-band" aria-hidden="true">
+            <!-- Decorative-only div, so aria-hidden keeps it out of screen reader output -->
+            <svg viewBox="0 0 900 60" preserveAspectRatio="none" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <!-- The scalable vector graphic that draws the animated cloud strip -->
+                <defs>
+                    <!-- Reusable puffy cloud built from overlapping circles, placed repeatedly below with <use> -->
+                    <g id="cloud-shape">
+                        <!-- Groups the shapes below into one named, reusable cloud unit -->
+                        <ellipse cx="0" cy="18" rx="28" ry="10"/>
+                        <!-- The cloud's flat, wide base shape -->
+                        <circle cx="-18" cy="12" r="11"/>
+                        <!-- Left puff of the cloud -->
+                        <circle cx="0" cy="7" r="13"/>
+                        <!-- Top-center puff, the tallest part of the cloud -->
+                        <circle cx="18" cy="12" r="11"/>
+                        <!-- Right puff of the cloud -->
+                        <circle cx="30" cy="16" r="8"/>
+                        <!-- Small outer puff on the right edge -->
+                        <circle cx="-30" cy="16" r="8"/>
+                        <!-- Small outer puff on the left edge -->
+                    </g>
+                </defs>
+                <!-- Back cloud layer drifts slowly in reverse for a parallax depth effect -->
+                <g class="drift-slow" fill="#eaf5fb" opacity="0.6">
+                    <!-- Group of faint, distant clouds; CSS animates this group's position -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="80" y="4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="340" y="-6"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="620" y="8"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="880" y="-4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1160" y="4"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1420" y="-6"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1700" y="8"/>
+                    <!-- Each <use> places one more copy of the cloud shape at a different x/y position -->
+                </g>
+                <!-- Front cloud layer drifts forward and sits lower, closer to the horizon -->
+                <g class="drift" fill="#ffffff">
+                    <!-- Group of brighter, closer clouds animated in the opposite direction -->
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="150" y="16"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="470" y="20"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="760" y="14"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1050" y="16"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1370" y="20"/>
+                    <use xlink:href="#cloud-shape" href="#cloud-shape" x="1660" y="14"/>
+                    <!-- Each <use> places one more copy of the cloud shape at a different x/y position -->
+                </g>
+            </svg>
+        </div>
+
+        <nav class="top-nav" aria-label="Main Navigation">
+            <!-- Semantic nav element, labeled for screen readers as the main navigation landmark -->
+            <a class="brand" href="index.html">🌲 CarbonCount</a>
+            <!-- Site logo/name, links back to the homepage -->
+            <!-- Part of Requirement 2 (Responsive Layout) -->
+            <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Toggle navigation menu">☰</button>
+            <!-- Hamburger button, only visible on narrow screens; toggled by site.js -->
+            <div id="nav-menu" class="nav-menu">
+                <!-- Container for the nav links; site.js adds the .open class on mobile when toggled -->
+                <a href="index.html" class="active">Home</a>
+                <!-- Link to this page; class="active" highlights it in the nav -->
+                <a href="about.html">About</a>
+                <!-- Link to the About page (merged About App + The Problem) -->
+                <a href="profile.html">Profile</a>
+                <a href="log.html">Daily Log</a>
+                <a href="route.html">Route Planner</a>
+            </div>
+        </nav>
+
+        <div class="hero-banner">
+            <!-- Wraps the hero photo and overlaid title text -->
+            <!-- Fulfills Requirement 4 (Image) -->
+            <!-- Fulfills Accessibility Feature (Alt Text) -->
+            <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=1200"
+                 alt="A green forest canopy showing vibrant natural ecosystem">
+            <!-- Hero photo; the alt text describes it for screen readers and for anyone whose image fails to load -->
+
+            <div class="hero-text" style="text-align: center; margin-top: 15px;">
+                <!-- Title text sits over/below the photo -->
+                <h1>CarbonCount</h1>
+                <!-- The single h1 on this page, naming the site -->
+                <p><em>Track. Learn. Improve.</em></p>
+                <!-- Short italicized tagline -->
+            </div>
+        </div>
+    </header>
+
+    <main class="home-intro">
+        <!-- Semantic main element holds this page's unique content -->
+        <p class="eyebrow">Your everyday climate companion</p>
+        <!-- Small uppercase label sitting above the main heading -->
+        <!-- Fulfills Accessibility Feature (Meaningful Headings) -->
+        <h2>Small routes add up to a big difference</h2>
+        <!-- First h2, continuing the logical h1 → h2 heading order -->
+        <p class="lede">CarbonCount helps you see the real footprint of how you get around — and makes sure that lower-carbon choices are actually reachable, not just theoretical. Every trip you log builds a clearer picture of your habits, your progress, and the accessible routes that work for you.</p>
+        <!-- Intro paragraph, styled larger via the .lede class -->
+
+        <!-- Rotating daily tip: JS below picks one line from a fixed list based on today's date -->
+        <div class="tip-banner" id="tip-banner">
+            <!-- Colored banner strip holding the tip of the day -->
+            <span class="tip-icon">💡</span>
+            <!-- Decorative lightbulb icon -->
+            <span id="tip-text">Loading today's tip…</span>
+            <!-- Placeholder text; replaced by the script below once the page loads -->
+        </div>
+
+        <!-- Innovative feature: an animated counter that adds up this browser's own logged low-carbon trips and miles -->
+        <div class="card" id="impact-counter-card">
+            <h3>Your Community Impact</h3>
+            <div class="impact-stats" id="impact-stats">
+                <!-- Filled in and animated by the script at the bottom of the page -->
+            </div>
+            <p style="font-size:0.82rem; color:#4f5f57; margin-top:8px;">Counts up from your own Daily Log entries on this device — log a few trips to watch it grow.</p>
+        </div>
+
+        <section class="card" id="quick-calc">
+            <h3>⚡ Quick Trip Estimator</h3>
+            <p>Curious what one trip costs the planet? Pick how you're traveling and enter the miles. Nothing here is saved.</p>
+            <div class="calc-row">
+                <div class="form-group">
+                    <label for="calc-mode">How are you traveling?</label>
+                    <select id="calc-mode">
+                        <option value="0.89" data-name="driving">Driving a car</option>
+                        <option value="0.45" data-name="transit">Public transit (bus/train)</option>
+                        <option value="0.10" data-name="accessible">Accessible routing (wheelchair/powerchair)</option>
+                        <option value="0" data-name="walking">Walking or biking</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="calc-miles">Miles</label>
+                    <input type="number" id="calc-miles" min="0" step="0.1" value="5">
+                </div>
+            </div>
+            <div class="calc-result" id="calc-result" role="status" aria-live="polite"></div>
+        </section>
+
+        <div class="two-col">
+            <!-- Two-column responsive grid; stacks to one column on narrow screens -->
+            <article class="card">
+                <h3>📍 Log your trips</h3>
+                <p>Record how you traveled today — driving, transit, walking, or accessible routing — and watch your footprint total update in real time.</p>
+                <!-- Fulfills Requirement 5 (Hyperlink) -->
+                <!-- Fulfills Accessibility Feature (Descriptive Links) -->
+                <p><a href="log.html">Go to your Daily Log →</a></p>
+                <!-- Link text names its destination instead of reading "click here" -->
+            </article>
+            <article class="card">
+                <h3>🧭 Build your profile</h3>
+                <p>Tell us about your travel preferences and accessibility needs so future route suggestions actually fit your life.</p>
+                <p><a href="profile.html">Set up your Profile →</a></p>
+            </article>
+        </div>
+
+        <section class="card">
+            <!-- Callout card pointing to the Route Planner page -->
+            <h3>🗺️ Plan the lowest-carbon route</h3>
+            <p>Tell the Route Planner where you're headed and it compares driving, cycling, and walking directions, then recommends whichever option is realistically the lowest-carbon for that trip.</p>
+            <p><a href="route.html">Open the Route Planner →</a></p>
+        </section>
+
+        <section class="card">
+            <!-- Short explainer card on why the app exists -->
+            <h3>🌍 Why this matters</h3>
+            <p>Transportation is one of the largest sources of household carbon emissions, but it's also one of the most personal — shaped by where you live, what your body needs, and what infrastructure is actually available to you. CarbonCount treats accessibility and climate impact as one connected problem, not two separate conversations. <a href="about.html#the-problem">Read more about the problem →</a></p>
+        </section>
+
+        <!-- Fulfills Requirement 6 (Data Table) -->
+        <section class="card">
+            <h3>Travel Mode Comparison</h3>
+            <p>A quick look at how common travel modes compare on carbon impact and accessibility.</p>
+            <div class="table-scroll">
+                <!-- Wraps the table so it can scroll horizontally on very small screens instead of breaking the layout -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Travel Mode</th>
+                            <!-- scope="col" ties this header to its column for screen readers -->
+                            <th scope="col">Est. CO₂ per Mile</th>
+                            <th scope="col">Typically Accessible?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Driving a car</td>
+                            <td>~0.89 lbs</td>
+                            <td>Yes</td>
+                        </tr>
+                        <tr>
+                            <td>Public transit (bus/train)</td>
+                            <td>~0.45 lbs</td>
+                            <td>Varies by station</td>
+                        </tr>
+                        <tr>
+                            <td>Accessible routing (wheelchair/powerchair)</td>
+                            <td>~0.10 lbs</td>
+                            <td>Depends on ramps/elevators</td>
+                        </tr>
+                        <tr>
+                            <td>Walking or biking</td>
+                            <td>~0.00 lbs</td>
+                            <td>Not always (distance, terrain)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SDG section: ties the app's goals to six specific UN Sustainable Development Goals -->
+        <section class="card">
+            <h3>Aligned with the UN Sustainable Development Goals</h3>
+            <p>CarbonCount is built around a few specific SDGs — reducing emissions can't come at the cost of leaving disabled and low-mobility riders behind.</p>
+            <div class="sdg-grid">
+                <!-- Responsive grid of six color-coded SDG cards -->
+                <div class="sdg-card sdg-3">
+                    <span class="sdg-num">3</span>
+                    <h4>Good Health & Well-Being</h4>
+                    <p>Encourages active, low-emission travel like walking and biking wherever it's genuinely accessible to you.</p>
+                </div>
+                <div class="sdg-card sdg-7">
+                    <span class="sdg-num">7</span>
+                    <h4>Affordable & Clean Energy</h4>
+                    <p>Favors transit and routing options that lean on cleaner energy sources over single-occupancy driving.</p>
+                </div>
+                <div class="sdg-card sdg-10">
+                    <span class="sdg-num">10</span>
+                    <h4>Reduced Inequalities</h4>
+                    <p>Centers disabled and mobility-limited riders in climate planning instead of treating them as an edge case.</p>
+                </div>
+                <div class="sdg-card sdg-11">
+                    <span class="sdg-num">11</span>
+                    <h4>Sustainable Cities & Communities</h4>
+                    <p>Highlights where transit infrastructure works — and where accessibility gaps quietly push people back into cars.</p>
+                </div>
+                <div class="sdg-card sdg-12">
+                    <span class="sdg-num">12</span>
+                    <h4>Responsible Consumption</h4>
+                    <p>Makes the day-to-day carbon cost of travel choices visible instead of invisible.</p>
+                </div>
+                <div class="sdg-card sdg-13">
+                    <span class="sdg-num">13</span>
+                    <h4>Climate Action</h4>
+                    <p>Every logged trip nudges you toward the lowest-carbon option that's realistically available to you.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Image gallery: additional images beyond the hero photo -->
+        <section class="card">
+            <h3>The world we're routing through</h3>
+            <div class="gallery-grid">
+                <!-- Responsive grid of photo cards -->
+                <figure>
+                    <img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=600"
+                         alt="Green rolling hills and mountains under a clear sky">
+                    <!-- Alt text describes the photo for screen readers -->
+                    <figcaption>Healthy landscapes depend on lower-carbon travel</figcaption>
+                </figure>
+                <figure>
+                    <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600"
+                         alt="Sunlight streaming through a dense green forest">
+                    <figcaption>Every low-carbon trip adds up over time</figcaption>
+                </figure>
+                <figure>
+                    <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600"
+                         alt="Aerial view of a city skyline at dusk with visible transit corridors">
+                    <figcaption>Accessible transit shapes real climate outcomes</figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <!-- Mini reviews section: horizontally scrolling carousel of testimonials, navigated with arrow buttons -->
+        <section class="card">
+            <h3>What early users are saying</h3>
+            <div class="carousel-wrap">
+                <!-- Flex row holding the prev arrow, scrollable track, and next arrow -->
+                <button type="button" class="carousel-arrow carousel-prev" id="reviews-prev" aria-label="Show previous reviews">‹</button>
+                <!-- Scrolls the track backward; wired up in the script below -->
+                <div class="reviews-grid" id="reviews-track">
+                    <!-- Horizontally scrollable row of review cards -->
+                    <div class="review-card">
+                        <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                        <p class="review-quote">"I love this app — it's the first tracker that actually gets what accessible travel looks like."</p>
+                        <p class="review-author">Maya R.</p>
+                        <p class="review-role">Wheelchair user, Jersey City</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                        <p class="review-quote">"Logging my commute takes ten seconds and actually made me notice how often I default to driving."</p>
+                        <p class="review-author">Devon L.</p>
+                        <p class="review-role">Daily transit rider</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-stars" aria-label="4 out of 5 stars">★★★★☆</div>
+                        <p class="review-quote">"Love the accessibility profile options. Would love device sync in a future update."</p>
+                        <p class="review-author">Priya K.</p>
+                        <p class="review-role">Chronic illness advocate</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                        <p class="review-quote">"The weekly goal and streak actually got me to walk to the station instead of driving three days this week."</p>
+                        <p class="review-author">Jordan T.</p>
+                        <p class="review-role">Grad student</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-stars" aria-label="4 out of 5 stars">★★★★☆</div>
+                        <p class="review-quote">"Route Planner comparing driving vs. cycling side by side is exactly the nudge I needed to see."</p>
+                        <p class="review-author">Elena F.</p>
+                        <p class="review-role">Bike commuter</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                        <p class="review-quote">"Refreshing to see a climate app treat accessibility as core, not an afterthought bullet point."</p>
+                        <p class="review-author">Marcus B.</p>
+                        <p class="review-role">Accessibility consultant</p>
+                    </div>
+                </div>
+                <button type="button" class="carousel-arrow carousel-next" id="reviews-next" aria-label="Show more reviews">›</button>
+                <!-- Scrolls the track forward; wired up in the script below -->
+            </div>
+        </section>
+
+        <!-- Fulfills Requirement 5 (Hyperlink) -->
+        <p style="margin-top: 24px;">Curious about the bigger picture? Explore global data via the <a href="https://unfccc.int/" target="_blank" rel="noopener">UN Climate Change Portal</a>.</p>
+        <!-- Real external link; target="_blank" opens a new tab, rel="noopener" stops that tab from accessing this page -->
+
+        <!-- Further Reading: extra external hyperlinks to real articles/organizations for context -->
+        <section class="card">
+            <h3>Further Reading</h3>
+            <ul>
+                <li><a href="https://www.epa.gov/greenvehicles/fast-facts-transportation-greenhouse-gas-emissions" target="_blank" rel="noopener">EPA: Fast Facts on Transportation Greenhouse Gas Emissions</a></li>
+                <li><a href="https://www.who.int/news-room/fact-sheets/detail/disability-and-health" target="_blank" rel="noopener">World Health Organization: Disability and Health Overview</a></li>
+                <li><a href="https://sdgs.un.org/goals" target="_blank" rel="noopener">United Nations: The 17 Sustainable Development Goals</a></li>
+                <li><a href="https://www.transit.dot.gov/ADA" target="_blank" rel="noopener">U.S. Federal Transit Administration: ADA Accessibility Standards</a></li>
+            </ul>
+        </section>
+        <!-- Fulfills Accessibility Feature (Sufficient Color Contrast) -->
+    </main>
+
+    <footer>
+        <!-- Semantic footer element -->
+        <p>&copy; 2026 CarbonCount</p>
+        <!-- Copyright line; site.js inserts the subscribe form and share button above this -->
+    </footer>
+
+    <script>
+        // Quick Trip Estimator: same per-mile factors as the Daily Log (lbs CO2 per mile).
+        (function () {
+            var modeSel = document.getElementById('calc-mode');
+            var milesIn = document.getElementById('calc-miles');
+            var out = document.getElementById('calc-result');
+            if (!modeSel || !milesIn || !out) return;
+            var DRIVING = 0.89;
+            var LBS_PER_GALLON = 19.6; // EPA: about 8,887 g of CO2 per gallon of gasoline
+            function update() {
+                var miles = parseFloat(milesIn.value);
+                if (isNaN(miles) || miles < 0) { out.textContent = 'Enter a distance in miles to see the estimate.'; return; }
+                var factor = parseFloat(modeSel.value);
+                var co2 = miles * factor;
+                var html = 'This trip: about <strong>' + co2.toFixed(1) + ' lbs</strong> of CO\u2082.';
+                if (factor < DRIVING && miles > 0) {
+                    var saved = miles * (DRIVING - factor);
+                    html += '<span class="calc-win">Driving the same distance would add about ' + (miles * DRIVING).toFixed(1) +
+                            ' lbs, so you save roughly ' + saved.toFixed(1) + ' lbs.</span>';
+                } else if (factor === DRIVING && miles > 0) {
+                    html += '<span class="calc-win">That is about the CO\u2082 from burning ' + (co2 / LBS_PER_GALLON).toFixed(2) + ' gallons of gasoline.</span>';
+                }
+                out.innerHTML = html;
+            }
+            modeSel.addEventListener('change', update);
+            milesIn.addEventListener('input', update);
+            update();
+        })();
+    </script>
+    <script src="site.js"></script>
+    <!-- Loads the shared site script (nav toggle, dark mode, accessibility panel, search, footer extras) -->
+    <script>
+        // A short list of rotating tips shown on the homepage, one per day.
+        var ecoTips = [
+            "Combining two short errands into one trip can cut that day's driving footprint in half.",
+            "Public transit with a full elevator status check beats a car trip for both cost and carbon.",
+            "Walking under a mile produces roughly the same CO₂ as an empty room — basically none.",
+            "Carpooling with even one other rider effectively halves your per-person emissions for that trip.",
+            "Checking accessibility status before you leave saves a wasted trip and a return drive.",
+            "A short bike ride replacing a short drive is one of the single biggest per-mile carbon cuts available."
+        ];
+        // Picks the same tip all day by using the day-of-year as a stable index into the list.
+        var dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000); // days since Jan 1 this year
+        document.getElementById('tip-text').textContent = ecoTips[dayOfYear % ecoTips.length]; // wraps around once past the list length
+
+        // Reviews carousel: each arrow click scrolls the track sideways by roughly one card's width.
+        var track = document.getElementById('reviews-track'); // the scrollable row of review cards
+        document.getElementById('reviews-prev').addEventListener('click', function () {
+            track.scrollBy({ left: -260, behavior: 'smooth' }); // scrolls backward smoothly
+        });
+        document.getElementById('reviews-next').addEventListener('click', function () {
+            track.scrollBy({ left: 260, behavior: 'smooth' }); // scrolls forward smoothly
+        });
+
+        // Innovative feature: reads this browser's own Daily Log entries and animates a "count up" impact summary,
+        // so the homepage feels alive and personalized instead of showing the same static numbers for everyone.
+        function renderImpactCounter() {
+            var entries = JSON.parse(localStorage.getItem('cp_log_entries') || '[]'); // every trip logged on the Daily Log page
+            var lowCarbonMiles = entries
+                .filter(function (e) { return e.type === 'walking' || e.type === 'accessible' || e.type === 'transit'; }) // keeps only lower-carbon modes
+                .reduce(function (sum, e) { return sum + e.miles; }, 0); // adds up their miles
+            var drivingMiles = entries
+                .filter(function (e) { return e.type === 'driving'; }) // keeps only driving trips
+                .reduce(function (sum, e) { return sum + e.miles; }, 0); // adds up their miles
+            var co2Avoided = lowCarbonMiles * 0.89; // rough estimate: CO2 that would've been emitted if these miles had been driven instead (EPA avg. passenger vehicle rate)
+
+            var box = document.getElementById('impact-stats');
+            box.innerHTML =
+                '<div class="status-card"><h3>Low-Carbon Miles</h3><p class="status-value" id="count-miles">0</p></div>' +
+                '<div class="status-card"><h3>Trips Logged</h3><p class="status-value" id="count-trips">0</p></div>' +
+                '<div class="status-card"><h3>Est. CO₂ Avoided (lbs)</h3><p class="status-value" id="count-co2">0</p></div>';
+            // Builds three stat cards with starting value 0, which animateCount() below counts up from.
+
+            animateCount('count-miles', lowCarbonMiles, 1); // animates the miles number counting up
+            animateCount('count-trips', entries.length, 0); // animates the trip count counting up
+            animateCount('count-co2', co2Avoided, 1); // animates the CO2-avoided number counting up
+        }
+
+        // Animates a number counting up from 0 to its target value over about half a second.
+        function animateCount(elId, target, decimals) {
+            var el = document.getElementById(elId);
+            var start = 0;
+            var duration = 600; // total animation length in milliseconds
+            var startTime = performance.now();
+            function step(now) {
+                var progress = Math.min((now - startTime) / duration, 1); // 0 to 1 over the animation's duration
+                var current = start + (target - start) * progress; // linear interpolation toward the target
+                el.textContent = current.toFixed(decimals); // updates the displayed number each frame
+                if (progress < 1) requestAnimationFrame(step); // keeps animating until progress reaches 1
+            }
+            requestAnimationFrame(step); // kicks off the animation loop
+        }
+
+        renderImpactCounter(); // runs the impact counter once the page loads
+    </script>
+</body>
+</html>
